@@ -19,12 +19,13 @@
     "prepublishOnly": "pnpm build"
   },
   "peerDependencies": {
-    "vue": "^3.0.0"
+    "vue": "^3.4.0"
   },
   "dependencies": {
     "@grey-parrot-i18n/core": "workspace:*"
   },
   "devDependencies": {
-    "vue": "^3.0.0"
+    "unbuild": "^2.0.0",
+    "vue": "^3.4.0"
   }
 }
