@@ -1,7 +1,7 @@
 import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
 import { createApp, defineComponent, h } from 'vue'
-import { createI18n, useI18n } from '..'
+import { createI18n, useI18n } from '../index'
 
 describe('vue integration', () => {
   const messages = {
