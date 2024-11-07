@@ -19,6 +19,16 @@
 - `packages/dashboard`: 翻译管理面板 (Nuxt.js)
 - `packages/cli`: 命令行工具
 
+## ROADMAP
+
+- [ ] 完成 SDK 实现
+  - [x] 完成核心实现
+  - [x] 完成 Vue 集成实现
+  - [ ] 完成 React 集成实现
+  - [ ] 完成 Flutter SDK 实现
+- [ ] 完成翻译管理面板
+- [ ] 完成命令行工具
+
 ## 开始使用
 
 待补充...
