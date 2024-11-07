@@ -1,8 +1,8 @@
 {
-  "name": "@grey-parrot-i18n/core",
+  "name": "@grey-parrot-i18n/vue",
   "type": "module",
   "version": "0.1.0",
-  "description": "Grey Parrot I18n Core Package",
+  "description": "Grey Parrot I18n Vue Integration",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -18,9 +18,13 @@
     "build": "unbuild",
     "prepublishOnly": "pnpm build"
   },
+  "peerDependencies": {
+    "vue": "^3.0.0"
+  },
   "dependencies": {
-    "@vue/reactivity": "^3.5.12"
+    "@grey-parrot-i18n/core": "workspace:*"
   },
   "devDependencies": {
+    "vue": "^3.0.0"
   }
 }

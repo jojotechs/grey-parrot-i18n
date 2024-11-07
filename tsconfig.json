@@ -7,7 +7,6 @@
     "strict": true,
     "declaration": true,
     "esModuleInterop": true,
-    "preserveSymlinks": true,
     "skipLibCheck": true
   }
 }
