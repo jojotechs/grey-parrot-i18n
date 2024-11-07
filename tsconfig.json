@@ -3,11 +3,11 @@
     "target": "ESNext",
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "strict": true,
-    "skipLibCheck": true,
-    "esModuleInterop": true,
     "resolveJsonModule": true,
+    "strict": true,
     "declaration": true,
-    "preserveSymlinks": true
+    "esModuleInterop": true,
+    "preserveSymlinks": true,
+    "skipLibCheck": true
   }
-} 
+}

@@ -1,4 +1,4 @@
-import { ref, readonly } from '@vue/reactivity'
+import { readonly, ref } from '@vue/reactivity'
 
 type Languages = Record<string, Record<string, string>>
 type LocaleType = string
@@ -6,7 +6,7 @@ type LocaleType = string
 class I18n {
   private languages: Languages = {}
   private currentLocale = ref('')
-  
+
   constructor(defaultLocale: LocaleType, messages: Languages) {
     this.languages = messages
     this.currentLocale.value = defaultLocale
@@ -21,7 +21,8 @@ class I18n {
   setLocale(locale: LocaleType) {
     if (this.languages[locale]) {
       this.currentLocale.value = locale
-    } else {
+    }
+    else {
       console.warn(`Language ${locale} not found`)
     }
   }
@@ -29,7 +30,7 @@ class I18n {
   // 翻译方法
   $t(key: string, params?: Record<string, string>): string {
     const message = this.languages[this.currentLocale.value]?.[key]
-    
+
     if (!message) {
       console.warn(`Translation key "${key}" not found`)
       return key
@@ -38,7 +39,7 @@ class I18n {
     if (params) {
       return Object.entries(params).reduce(
         (acc, [key, value]) => acc.replace(new RegExp(`{${key}}`, 'g'), value),
-        message
+        message,
       )
     }
 

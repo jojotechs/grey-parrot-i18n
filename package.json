@@ -3,22 +3,22 @@
   "version": "0.1.0",
   "private": true,
   "description": "A comprehensive i18n solution for developers",
-  "scripts": {
-    "dev": "pnpm -r run dev",
-    "build": "pnpm -r run build",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
-  },
+  "author": "",
+  "license": "MIT",
   "keywords": [
     "i18n",
     "internationalization",
     "translation"
   ],
-  "author": "",
-  "license": "MIT",
+  "scripts": {
+    "dev": "pnpm -r run dev",
+    "build": "pnpm -r run build",
+    "lint": "eslint --cache .",
+    "lint:fix": "pnpm lint --fix"
+  },
   "devDependencies": {
-    "@antfu/eslint-config": "^2.8.0",
-    "eslint": "^8.57.0",
-    "typescript": "^5.3.3"
+    "@antfu/eslint-config": "^3.7.3",
+    "eslint": "^9.11.1",
+    "typescript": "^5.6.2"
   }
-} 
+}
