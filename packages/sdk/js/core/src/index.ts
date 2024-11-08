@@ -31,6 +31,16 @@ export class I18n {
     }
   }
 
+  private replaceParams(text: string, params?: Record<string, string>): string {
+    if (!params)
+      return text
+
+    return Object.entries(params).reduce(
+      (acc, [key, value]) => acc.replace(new RegExp(`{${key}}`, 'g'), value),
+      text,
+    )
+  }
+
   $t(key: string, params?: Record<string, string>): string {
     const message = this.getMessage(key, this.currentLocale.value)
       || (this.fallbackLocale && this.getMessage(key, this.fallbackLocale))
@@ -40,13 +50,12 @@ export class I18n {
       return key
     }
 
-    if (!params)
-      return message
+    return this.replaceParams(message, params)
+  }
 
-    return Object.entries(params).reduce(
-      (acc, [key, value]) => acc.replace(new RegExp(`{${key}}`, 'g'), value),
-      message,
-    )
+  // different from $t, $tt is for placeholder which is not in the message, will be collected by cli and added to messages
+  $tt(text: string, params?: Record<string, string>): string {
+    return this.replaceParams(text, params)
   }
 
   private getMessage(key: string, locale: LocaleType): string | undefined {

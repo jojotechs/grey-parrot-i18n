@@ -6,8 +6,6 @@ export interface ProjectConfig {
 }
 
 export interface ScanOptions {
-  watch?: boolean
-  output?: string
   include?: string[]
   exclude?: string[]
 }
