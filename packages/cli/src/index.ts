@@ -10,7 +10,7 @@ import { Command } from 'commander'
 const program = new Command()
 
 // CLI 信息
-console.log(boxen(chalk.green('Grey Parrot I18n CLI'), {
+console.log(boxen(chalk.green('🦜 Grey Parrot I18n CLI'), {
   padding: 1,
   margin: 1,
   borderStyle: 'round',
