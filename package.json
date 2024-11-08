@@ -12,6 +12,7 @@
   ],
   "scripts": {
     "dev": "pnpm -r run dev",
+    "dev:cli": "pnpm -r run dev --filter cli",
     "build": "pnpm -r run build",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
