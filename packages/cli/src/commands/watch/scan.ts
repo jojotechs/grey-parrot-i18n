@@ -1,12 +1,4 @@
-interface I18nMatch {
-  text: string
-  fullMatch: string
-  start: number
-  end: number
-  lineNumber: number
-  column: number
-  params?: string
-}
+import type { I18nMatch } from '../../types'
 
 export function extractI18nText(content: string): I18nMatch[] {
   const regex = /\$tt\(\s*['"](.+?)['"](?:\s*,\s*(\{[^}]+\}))?\)/g

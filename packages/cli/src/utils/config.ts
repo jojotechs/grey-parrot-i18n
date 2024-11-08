@@ -1,18 +1,22 @@
 import type { ProjectConfig } from '../types'
-import { readFile, writeFile } from 'node:fs/promises'
+import { writeFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
+import { cosmiconfig } from 'cosmiconfig'
 
-const CONFIG_FILE = '.grey-parrot.json'
+const explorer = cosmiconfig('grey-parrot')
 
 export function getConfigDir(): string {
-  return resolve(process.cwd(), CONFIG_FILE, '..')
+  return process.cwd()
 }
 
 export async function getConfig(): Promise<ProjectConfig> {
   try {
-    const content = await readFile(resolve(process.cwd(), CONFIG_FILE), 'utf-8')
+    const result = await explorer.search()
+    if (!result || !result.config)
+      throw new Error('配置不存在')
+
     return {
-      ...JSON.parse(content),
+      ...result.config,
       scanDir: '.', // 默认使用配置文件所在目录
     }
   }
@@ -22,8 +26,6 @@ export async function getConfig(): Promise<ProjectConfig> {
 }
 
 export async function createConfig(config: ProjectConfig): Promise<void> {
-  await writeFile(
-    resolve(process.cwd(), CONFIG_FILE),
-    JSON.stringify(config, null, 2),
-  )
+  const configPath = resolve(process.cwd(), '.grey-parrotrc.json')
+  await writeFile(configPath, JSON.stringify(config, null, 2))
 }

@@ -1,7 +1,6 @@
 export interface ProjectConfig {
-  projectName: string
+  projectId: string // TODO: 项目ID，后面从dashboard获取
   defaultLocale: string
-  supportedLocales: string[]
   scanDir: string
 }
 
@@ -10,9 +9,12 @@ export interface ScanOptions {
   exclude?: string[]
 }
 
-export interface CollectedMessage {
-  raw: string
-  file: string
-  line: number
-  params?: string[]
+export interface I18nMatch {
+  text: string
+  fullMatch: string
+  start: number
+  end: number
+  lineNumber: number
+  column: number
+  params?: string
 }
