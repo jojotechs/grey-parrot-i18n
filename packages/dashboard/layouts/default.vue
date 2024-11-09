@@ -1,38 +1,50 @@
 <template>
-  <div class="h-screen flex flex-col">
-    <!-- 顶部导航栏 -->
-    <header class="h-[60px] border-b px-4 flex items-center justify-between">
-      <div class="flex items-center gap-2">
-        <div class="font-bold text-lg">🦜 Grey Parrot i18n</div>
-      </div>
-      <div>
-        <UButton
-          color="gray"
-          variant="ghost"
-          icon="i-heroicons-user-circle"
-        />
-      </div>
-    </header>
+  <div class="min-h-screen bg-gray-50 dark:bg-gray-900 p-4">
+    <div class="flex flex-col h-[calc(100vh-2rem)] gap-4">
+      <!-- 顶部导航栏 -->
+      <UCard :ui="{ 
+        body: {
+          padding: '!py-3'
+        }
+       }">
+        <div class="h-[40px] flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <div class="font-bold text-lg">🦜 Grey Parrot i18n</div>
+          </div>
+          <div>
+            <UButton
+              color="gray"
+              variant="ghost"
+              icon="i-heroicons-user-circle"
+            />
+          </div>
+        </div>
+      </UCard>
 
-    <!-- 主要内容区域 -->
-    <div class="flex flex-1 overflow-hidden">
-      <!-- 左侧导航 -->
-      <aside class="w-64 border-r border-gray-200 dark:border-gray-800 p-4 overflow-y-auto">
-        <UVerticalNavigation
-          :links="navigationLinks"
-          :ui="{
-            wrapper: 'space-y-2',
-            base: 'group flex items-center gap-2 w-full p-2 rounded-md',
-            active: 'text-primary-500 dark:text-primary-400 bg-primary-50 dark:bg-primary-950',
-            inactive: 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'
-          }"
-        />
-      </aside>
+      <!-- 主要内容区域 -->
+      <div class="flex flex-1 gap-4 overflow-hidden p-1">
+        <!-- 左侧导航 -->
+        <UCard class="w-64">
+          <div class="h-full">
+            <UVerticalNavigation
+              :links="navigationLinks"
+              :ui="{
+                wrapper: 'space-y-2',
+                base: 'group flex items-center gap-2 w-full p-2 rounded-md',
+                active: 'text-primary-500 dark:text-primary-400 bg-primary-50 dark:bg-primary-950',
+                inactive: 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'
+              }"
+            />
+          </div>
+        </UCard>
 
-      <!-- 主内容区 -->
-      <main class="flex-1 overflow-auto p-6">
-        <slot />
-      </main>
+        <!-- 主内容区 -->
+        <UCard class="flex-1">
+          <main class="h-full overflow-auto">
+            <slot />
+          </main>
+        </UCard>
+      </div>
     </div>
   </div>
 </template>
