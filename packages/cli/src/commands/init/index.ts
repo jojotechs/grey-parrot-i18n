@@ -4,11 +4,14 @@ import chalk from 'chalk'
 import inquirer from 'inquirer'
 import ora from 'ora'
 import { createConfig } from '../../utils/config'
+import { DEFAULT_SCAN_PATTERNS } from '../../utils/constants'
 
 export async function init() {
   console.log(chalk.blue('\n🦜 让我们开始初始化您的多语言项目配置\n'))
 
-  const answers = await inquirer.prompt<ProjectConfig & { confirmScanDir: boolean }>([
+  const answers = await inquirer.prompt<
+    ProjectConfig & { confirmScanDir: boolean, projectType: 'js' | 'flutter' }
+  >([
     {
       type: 'input',
       name: 'projectId',
@@ -40,12 +43,24 @@ export async function init() {
       default: '.',
       when: answers => answers.confirmScanDir,
     },
+    {
+      type: 'list',
+      name: 'projectType',
+      message: '请选择项目类型:',
+      choices: [
+        { name: 'JavaScript/TypeScript', value: 'js' },
+        { name: 'Flutter', value: 'flutter' },
+      ],
+      default: 'js',
+    },
   ])
 
   const config: ProjectConfig = {
     projectId: answers.projectId,
     defaultLocale: answers.defaultLocale,
     scanDir: answers.scanDir || '.',
+    include: DEFAULT_SCAN_PATTERNS[answers.projectType].include,
+    exclude: DEFAULT_SCAN_PATTERNS[answers.projectType].exclude,
   }
 
   const spinner = ora('正在创建配置文件...').start()

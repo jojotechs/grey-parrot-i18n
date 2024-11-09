@@ -1,17 +1,17 @@
-import type { ScanOptions } from '../../types'
 import chalk from 'chalk'
 import ora from 'ora'
 import { getConfig } from '../../utils/config'
 import { createWatcher } from './watcher'
 
-export async function watch(options: ScanOptions) {
+export async function watch() {
   const spinner = ora('正在初始化监听服务...').start()
 
   try {
     const config = await getConfig()
     const watcher = await createWatcher({
-      ...options,
       scanDir: config.scanDir,
+      include: config.include,
+      exclude: config.exclude,
     })
 
     spinner.succeed(chalk.green('监听服务已启动'))

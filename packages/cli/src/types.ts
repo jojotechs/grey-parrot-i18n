@@ -2,6 +2,8 @@ export interface ProjectConfig {
   projectId: string // TODO: 项目ID，后面从dashboard获取
   defaultLocale: string
   scanDir: string
+  include: string[]
+  exclude: string[]
 }
 
 export interface ScanOptions {

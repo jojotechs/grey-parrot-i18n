@@ -18,8 +18,6 @@ export async function createWatcher(options: ScanOptions & { scanDir?: string })
   const configDir = getConfigDir()
   const watchPath = resolve(configDir, scanDir)
 
-  console.log('监听配置:', { watchPath, include, exclude })
-
   const watcher = chokidar.watch(watchPath, {
     ignored: (path, stats) => {
       // 获取相对路径，确保匹配模式正确
@@ -44,7 +42,6 @@ export async function createWatcher(options: ScanOptions & { scanDir?: string })
   })
 
   async function handleFile(filepath: string) {
-    console.log('进入检测path3', filepath)
     try {
       const content = await fs.readFile(resolve(watchPath, filepath), 'utf-8')
       const matches = extractI18nText(content)

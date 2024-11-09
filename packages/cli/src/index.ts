@@ -23,8 +23,6 @@ program
 program
   .command('watch')
   .description('监听项目中的多语言文案变化')
-  .option('--include <patterns...>', '包含的文件模式')
-  .option('--exclude <patterns...>', '排除的文件模式')
   .action(watch)
 
 program
