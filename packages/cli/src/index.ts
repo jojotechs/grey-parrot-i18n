@@ -2,6 +2,7 @@
 import boxen from 'boxen'
 import chalk from 'chalk'
 import { Command } from 'commander'
+import { init } from './commands/init'
 import { watch } from './commands/watch'
 
 const program = new Command()
@@ -25,5 +26,10 @@ program
   .option('--include <patterns...>', '包含的文件模式')
   .option('--exclude <patterns...>', '排除的文件模式')
   .action(watch)
+
+program
+  .command('init')
+  .description('初始化项目的多语言配置')
+  .action(init)
 
 program.parse()

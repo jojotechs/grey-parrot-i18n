@@ -12,7 +12,7 @@ export function getConfigDir(): string {
 export async function getConfig(): Promise<ProjectConfig> {
   try {
     const result = await explorer.search()
-    if (!result || !result.config)
+    if (!result?.config)
       throw new Error('配置不存在')
 
     return {
