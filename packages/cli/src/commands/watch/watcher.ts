@@ -3,6 +3,7 @@ import { promises as fs } from 'node:fs'
 import { resolve } from 'node:path'
 import chalk from 'chalk'
 import chokidar from 'chokidar'
+import micromatch from 'micromatch'
 import { getConfigDir } from '../../utils/config'
 import { DEFAULT_SCAN_PATTERNS } from '../../utils/constants'
 import { extractI18nText } from './scan'
@@ -17,13 +18,33 @@ export async function createWatcher(options: ScanOptions & { scanDir?: string })
   const configDir = getConfigDir()
   const watchPath = resolve(configDir, scanDir)
 
-  const watcher = chokidar.watch(include, {
+  console.log('监听配置:', { watchPath, include, exclude })
+
+  const watcher = chokidar.watch(watchPath, {
+    ignored: (path, stats) => {
+      // 获取相对路径，确保匹配模式正确
+      const relativePath = path.replace(watchPath, '').replace(/^\//, '')
+
+      // 检查是否在排除列表中
+      if (micromatch.isMatch(relativePath, exclude)) {
+        return true
+      }
+
+      // 如果是文件，检查是否匹配包含模式
+      if (stats?.isFile()) {
+        const matchInclude = micromatch.isMatch(relativePath, include)
+        return !matchInclude
+      }
+
+      return false
+    },
     cwd: watchPath,
-    ignored: exclude,
+    persistent: true,
     ignoreInitial: false,
   })
 
   async function handleFile(filepath: string) {
+    console.log('进入检测path3', filepath)
     try {
       const content = await fs.readFile(resolve(watchPath, filepath), 'utf-8')
       const matches = extractI18nText(content)
@@ -41,6 +62,9 @@ export async function createWatcher(options: ScanOptions & { scanDir?: string })
   }
 
   watcher
+    .on('ready', () => {
+      console.log('初始扫描完成，开始监听文件变化')
+    })
     .on('add', handleFile)
     .on('change', handleFile)
     .on('error', error => console.error(chalk.red('监听错误:', error)))
