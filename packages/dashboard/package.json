@@ -13,6 +13,7 @@
   "dependencies": {
     "@nuxt/ui": "^2.19.2",
     "@nuxthub/core": "^0.8.6",
+    "@sidebase/nuxt-auth": "^0.9.4",
     "argon2": "^0.41.1",
     "drizzle-orm": "^0.36.1",
     "nuxt": "^3.14.159",

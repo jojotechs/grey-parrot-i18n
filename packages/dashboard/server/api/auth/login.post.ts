@@ -1,4 +1,3 @@
-import { useSession } from '@nuxthub/core'
 import { eq } from 'drizzle-orm'
 import { z } from 'zod'
 import { definePublicEventHandler, verifyPassword } from '~/server/utils/auth'
@@ -25,16 +24,18 @@ export default definePublicEventHandler(async (event) => {
     })
   }
 
-  const session = await useSession(event)
-  await session.update({
-    userId: user.id,
-  })
-
-  return {
+  // 设置 session
+  await setServerSession(event, {
     user: {
       id: user.id,
       email: user.email,
       role: user.role,
     },
+  })
+
+  return {
+    id: user.id,
+    email: user.email,
+    role: user.role,
   }
 })

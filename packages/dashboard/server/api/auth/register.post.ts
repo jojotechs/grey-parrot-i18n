@@ -1,12 +1,13 @@
-import { useSession } from '@nuxthub/core'
 import { z } from 'zod'
+import { hashPassword } from '~/server/utils/auth'
+import { tables, useDrizzle } from '~/server/utils/drizzle'
 
 const registerSchema = z.object({
   email: z.string().email(),
   password: z.string().min(6),
 })
 
-export default definePublicEventHandler(async (event) => {
+export default defineEventHandler(async (event) => {
   const body = await readBody(event)
   const { email, password } = registerSchema.parse(body)
 
@@ -37,17 +38,18 @@ export default definePublicEventHandler(async (event) => {
     })
     .returning()
 
-  // 创建会话
-  const session = await useSession(event)
-  await session.update({
-    userId: user.id,
-  })
-
-  return {
+  // 设置 session
+  await setServerSession(event, {
     user: {
       id: user.id,
       email: user.email,
       role: user.role,
     },
+  })
+
+  return {
+    id: user.id,
+    email: user.email,
+    role: user.role,
   }
 })
