@@ -1,7 +1,3 @@
-import { clearServerSession } from '#auth'
-import { defineEventHandler } from 'h3'
+import { eventHandler } from 'h3'
 
-export default defineEventHandler(async (event) => {
-  await clearServerSession(event)
-  return { success: true }
-})
+export default eventHandler(() => ({ status: 'OK' }))

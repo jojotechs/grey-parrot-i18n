@@ -7,21 +7,42 @@ export default defineNuxtConfig({
     database: true,
   },
   auth: {
+    baseURL: '/api/auth',
     provider: {
       type: 'local',
       endpoints: {
-        signIn: { path: '/api/auth/login', method: 'post' },
-        signOut: { path: '/api/auth/logout', method: 'post' },
-        signUp: { path: '/api/auth/register', method: 'post' },
-        getSession: { path: '/api/auth/me', method: 'get' },
+        signIn: { path: '/login', method: 'post' },
+        signOut: { path: '/logout', method: 'post' },
+        signUp: { path: '/register', method: 'post' },
+        getSession: { path: '/me', method: 'get' },
       },
       pages: {
         login: '/login',
       },
+      token: {
+        signInResponseTokenPointer: '/token/accessToken',
+        type: 'Bearer',
+        headerName: 'Authorization',
+        maxAgeInSeconds: 30 * 60, // 30 minutes
+      },
+      session: {
+        dataType: {
+          id: 'number',
+          email: 'string',
+          role: 'string',
+        },
+        dataResponsePointer: '/user',
+      },
+      refresh: {
+        isEnabled: true,
+        endpoint: { path: '/refresh', method: 'post' },
+        token: {
+          signInResponseRefreshTokenPointer: '/token/refreshToken',
+        },
+      },
     },
-    session: {
-      enableSessionRefresh: true,
-      strategyKey: 'user',
+    globalAppMiddleware: {
+      isEnabled: true,
     },
   },
 })

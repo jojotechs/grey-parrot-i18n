@@ -1,5 +1,6 @@
+import { eq } from 'drizzle-orm'
 import { z } from 'zod'
-import { hashPassword } from '~/server/utils/auth'
+import { hashPassword, isFirstUser } from '~/server/utils/auth'
 import { tables, useDrizzle } from '~/server/utils/drizzle'
 
 const registerSchema = z.object({
@@ -38,15 +39,7 @@ export default defineEventHandler(async (event) => {
     })
     .returning()
 
-  // 设置 session
-  await setServerSession(event, {
-    user: {
-      id: user.id,
-      email: user.email,
-      role: user.role,
-    },
-  })
-
+  // 直接返回用户数据，nuxt-auth 会自动处理 session
   return {
     id: user.id,
     email: user.email,
