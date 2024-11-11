@@ -6,6 +6,9 @@ export default defineNuxtConfig({
   hub: {
     database: true,
   },
+  build: {
+    transpile: ['jsonwebtoken'],
+  },
   auth: {
     provider: {
       type: 'local',
