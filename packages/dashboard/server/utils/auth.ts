@@ -17,6 +17,13 @@ export async function verifyPassword(hashedPassword: string, password: string) {
   return await verify(hashedPassword, password)
 }
 
+// 提取 token
+export function extractToken(authorizationHeader: string) {
+  return authorizationHeader.startsWith('Bearer ')
+    ? authorizationHeader.slice(7)
+    : authorizationHeader
+}
+
 // 检查是否是首个用户
 export async function isFirstUser(): Promise<boolean> {
   const db = useDrizzle()

@@ -51,9 +51,3 @@ export default definePublicEventHandler(async (event) => {
     user: tokenData,
   }
 })
-
-export function extractToken(authorizationHeader: string) {
-  return authorizationHeader.startsWith('Bearer ')
-    ? authorizationHeader.slice(7)
-    : authorizationHeader
-}
