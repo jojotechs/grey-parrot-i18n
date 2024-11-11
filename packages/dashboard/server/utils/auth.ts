@@ -19,9 +19,9 @@ export async function verifyPassword(hashedPassword: string, password: string) {
 
 // 提取 token
 export function extractToken(authorizationHeader: string) {
-  return authorizationHeader.startsWith('Bearer ')
-    ? authorizationHeader.slice(7)
-    : authorizationHeader
+  // 匹配 Bearer token
+  const matches = authorizationHeader.match(/^Bearer\s(\S.*)$/i)
+  return matches ? matches[1].trim() : authorizationHeader
 }
 
 // 检查是否是首个用户
@@ -72,9 +72,4 @@ export function defineAdminEventHandler<T>(handler: (event: H3Event, user: User)
     }
     return handler(event, user)
   })
-}
-
-// 定义公开路由处理器
-export function definePublicEventHandler<T>(handler: (event: H3Event) => Promise<T>) {
-  return defineEventHandler(handler)
 }

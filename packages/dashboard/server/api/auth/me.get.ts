@@ -1,11 +1,11 @@
 import { eq } from 'drizzle-orm'
-import { createError, eventHandler, getRequestHeader } from 'h3'
+import { createError, getRequestHeader } from 'h3'
 import type { JWTTokenPayload } from '~/server/types'
 import { extractToken } from '~/server/utils/auth'
 import { tables, useDrizzle } from '~/server/utils/drizzle'
 import { verifyToken } from '~/server/utils/jwt'
 
-export default eventHandler(async (event) => {
+export default defineEventHandler(async (event) => {
   const authHeader = getRequestHeader(event, 'Authorization')
   if (!authHeader) {
     throw createError({
