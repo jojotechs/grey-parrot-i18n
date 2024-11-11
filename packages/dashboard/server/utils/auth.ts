@@ -2,9 +2,9 @@ import type { H3Event } from 'h3'
 import type { JWTTokenPayload } from '../types'
 import type { User } from './drizzle'
 import { getServerSession } from '#auth'
-import { hash, verify } from 'argon2'
 import { eq, sql } from 'drizzle-orm'
 import { createError } from 'h3'
+import { hash, verify } from './crypto'
 import { tables, useDrizzle } from './drizzle'
 
 // 密码加密
@@ -14,7 +14,7 @@ export async function hashPassword(password: string) {
 
 // 密码验证
 export async function verifyPassword(hashedPassword: string, password: string) {
-  return await verify(hashedPassword, password)
+  return await verify(password, hashedPassword)
 }
 
 // 提取 token
