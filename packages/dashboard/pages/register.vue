@@ -230,7 +230,7 @@ async function handleRegister() {
     await signIn({
       email: form.email,
       password: form.password,
-    })
+    }, { callbackUrl: '/' })
 
     // 显示成功提示
     useToast().add({
@@ -240,6 +240,7 @@ async function handleRegister() {
     })
   }
   catch (error: any) {
+    console.log('register error', error)
     useToast().add({
       title: '注册失败',
       description: error?.data?.message || '请检查输入是否正确',
