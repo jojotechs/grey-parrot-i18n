@@ -7,7 +7,6 @@ export default defineNuxtConfig({
     database: true,
   },
   auth: {
-    baseURL: '/api/auth',
     provider: {
       type: 'local',
       endpoints: {
@@ -29,7 +28,7 @@ export default defineNuxtConfig({
         dataType: {
           id: 'number',
           email: 'string',
-          role: 'string',
+          role: `admin | reader | editor`,
         },
         dataResponsePointer: '/user',
       },

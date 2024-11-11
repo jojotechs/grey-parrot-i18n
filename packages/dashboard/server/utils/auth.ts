@@ -1,4 +1,5 @@
 import type { H3Event } from 'h3'
+import type { JWTTokenPayload } from '../api/auth/login.post'
 import type { User } from './drizzle'
 import { getServerSession } from '#auth'
 import { hash, verify } from 'argon2'
@@ -29,7 +30,7 @@ export async function isFirstUser(): Promise<boolean> {
 // 定义需要认证的路由处理器
 export function defineAuthEventHandler<T>(handler: (event: H3Event, user: User) => Promise<T>) {
   return defineEventHandler(async (event) => {
-    const session = await getServerSession(event)
+    const session = await getServerSession(event) as { user: JWTTokenPayload } | null
     if (!session?.user) {
       throw createError({
         statusCode: 401,

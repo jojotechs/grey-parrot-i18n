@@ -1,10 +1,9 @@
+import type { JWTTokenPayload } from './login.post'
 import { eq } from 'drizzle-orm'
 import { createError, eventHandler, getRequestHeader } from 'h3'
 import { verify } from 'jsonwebtoken'
 import { tables, useDrizzle } from '~/server/utils/drizzle'
-import { extractToken } from './login.post'
-
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key'
+import { extractToken, JWT_SECRET } from './login.post'
 
 export default eventHandler(async (event) => {
   const authHeader = getRequestHeader(event, 'Authorization')
@@ -17,11 +16,7 @@ export default eventHandler(async (event) => {
 
   try {
     const token = extractToken(authHeader)
-    const decoded = verify(token, JWT_SECRET) as {
-      id: number
-      email: string
-      role: string
-    }
+    const decoded = verify(token, JWT_SECRET) as JWTTokenPayload
 
     const db = useDrizzle()
     const user = await db.query.users.findFirst({
