@@ -1,9 +1,9 @@
 import { eq } from 'drizzle-orm'
 import { createError, eventHandler, readBody } from 'h3'
-import { sign, verify } from 'jsonwebtoken'
 import type { JWTTokenPayload } from '~/server/types'
-import { ACCESS_TOKEN_TTL, JWT_SECRET } from '~/server/utils/constant'
+import { ACCESS_TOKEN_TTL } from '~/server/utils/constant'
 import { tables, useDrizzle } from '~/server/utils/drizzle'
+import { signToken, verifyToken } from '~/server/utils/jwt'
 
 export default eventHandler(async (event) => {
   const body = await readBody<{ refreshToken: string }>(event)
@@ -17,7 +17,7 @@ export default eventHandler(async (event) => {
   }
 
   try {
-    const decoded = verify(refreshToken, JWT_SECRET) as JWTTokenPayload
+    const decoded = await verifyToken<JWTTokenPayload>(refreshToken)
 
     const db = useDrizzle()
     const user = await db.query.users.findFirst({
@@ -37,10 +37,7 @@ export default eventHandler(async (event) => {
       role: user.role,
     }
 
-    // 生成新的访问令牌
-    const accessToken = sign(tokenData, JWT_SECRET, {
-      expiresIn: ACCESS_TOKEN_TTL,
-    })
+    const accessToken = await signToken(tokenData, ACCESS_TOKEN_TTL)
 
     return {
       token: {
