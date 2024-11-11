@@ -1,9 +1,10 @@
-import type { JWTTokenPayload } from './login.post'
 import { eq } from 'drizzle-orm'
 import { createError, eventHandler, getRequestHeader } from 'h3'
 import { verify } from 'jsonwebtoken'
+import type { JWTTokenPayload } from '~/server/types'
+import { JWT_SECRET } from '~/server/utils/constant'
 import { tables, useDrizzle } from '~/server/utils/drizzle'
-import { extractToken, JWT_SECRET } from './login.post'
+import { extractToken } from './login.post'
 
 export default eventHandler(async (event) => {
   const authHeader = getRequestHeader(event, 'Authorization')

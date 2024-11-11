@@ -1,19 +1,15 @@
 import { eq } from 'drizzle-orm'
 import { sign } from 'jsonwebtoken'
 import { z } from 'zod'
+import type { JWTTokenPayload } from '~/server/types'
 import { definePublicEventHandler, verifyPassword } from '~/server/utils/auth'
-import type { User } from '~/server/utils/drizzle'
+import { ACCESS_TOKEN_TTL, JWT_SECRET } from '~/server/utils/constant'
 import { tables, useDrizzle } from '~/server/utils/drizzle'
-
-export const JWT_SECRET = process.env.JWT_SECRET || 'grey-parrot-secret'
-export const ACCESS_TOKEN_TTL = 60 * 60 // 1 hour
 
 const loginSchema = z.object({
   email: z.string().email(),
   password: z.string(),
 })
-
-export type JWTTokenPayload = Omit<User, 'password' | 'createdAt'>
 
 export default definePublicEventHandler(async (event) => {
   const body = await readBody(event)

@@ -1,5 +1,5 @@
 import type { H3Event } from 'h3'
-import type { JWTTokenPayload } from '../api/auth/login.post'
+import type { JWTTokenPayload } from '../types'
 import type { User } from './drizzle'
 import { getServerSession } from '#auth'
 import { hash, verify } from 'argon2'

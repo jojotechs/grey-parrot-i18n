@@ -1,9 +1,9 @@
-import type { JWTTokenPayload } from './login.post'
 import { eq } from 'drizzle-orm'
 import { createError, eventHandler, readBody } from 'h3'
 import { sign, verify } from 'jsonwebtoken'
+import type { JWTTokenPayload } from '~/server/types'
+import { ACCESS_TOKEN_TTL, JWT_SECRET } from '~/server/utils/constant'
 import { tables, useDrizzle } from '~/server/utils/drizzle'
-import { ACCESS_TOKEN_TTL, JWT_SECRET } from './login.post'
 
 export default eventHandler(async (event) => {
   const body = await readBody<{ refreshToken: string }>(event)
