@@ -1,10 +1,10 @@
 import { eq } from 'drizzle-orm'
-import { sign } from 'jsonwebtoken'
 import { z } from 'zod'
 import type { JWTTokenPayload } from '~/server/types'
 import { definePublicEventHandler, verifyPassword } from '~/server/utils/auth'
-import { ACCESS_TOKEN_TTL, JWT_SECRET } from '~/server/utils/constant'
+import { ACCESS_TOKEN_TTL } from '~/server/utils/constant'
 import { tables, useDrizzle } from '~/server/utils/drizzle'
+import { signToken } from '~/server/utils/jwt'
 
 const loginSchema = z.object({
   email: z.string().email(),
@@ -33,15 +33,8 @@ export default definePublicEventHandler(async (event) => {
     role: user.role,
   }
 
-  // 生成访问令牌
-  const accessToken = sign(tokenData, JWT_SECRET, {
-    expiresIn: ACCESS_TOKEN_TTL,
-  })
-
-  // 生成刷新令牌
-  const refreshToken = sign(tokenData, JWT_SECRET, {
-    expiresIn: '7d',
-  })
+  const accessToken = await signToken(tokenData, ACCESS_TOKEN_TTL)
+  const refreshToken = await signToken(tokenData, '7d')
 
   return {
     token: {

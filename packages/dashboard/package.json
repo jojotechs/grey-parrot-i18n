@@ -16,14 +16,13 @@
     "@sidebase/nuxt-auth": "^0.9.4",
     "argon2": "^0.41.1",
     "drizzle-orm": "^0.36.1",
-    "jsonwebtoken": "^9.0.2",
+    "jose": "^5.9.6",
     "nuxt": "^3.14.159",
     "vue": "latest",
     "vue-router": "latest",
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@types/jsonwebtoken": "^9.0.7",
     "drizzle-kit": "^0.28.0",
     "wrangler": "^3.86.0"
   }
