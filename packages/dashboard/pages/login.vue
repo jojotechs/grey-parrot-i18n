@@ -104,7 +104,7 @@ async function handleLogin() {
   catch (error: any) {
     useToast().add({
       title: '登录失败',
-      description: error?.message || '请检查邮箱和密码是否正确',
+      description: error?.data?.message || '请检查邮箱和密码是否正确',
       color: 'red',
     })
   }

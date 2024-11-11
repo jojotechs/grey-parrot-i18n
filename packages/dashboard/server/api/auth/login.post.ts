@@ -1,7 +1,7 @@
 import { eq } from 'drizzle-orm'
 import { z } from 'zod'
 import type { JWTTokenPayload } from '~/server/types'
-import { definePublicEventHandler, verifyPassword } from '~/server/utils/auth'
+import { verifyPassword } from '~/server/utils/auth'
 import { ACCESS_TOKEN_TTL } from '~/server/utils/constant'
 import { tables, useDrizzle } from '~/server/utils/drizzle'
 import { signToken } from '~/server/utils/jwt'
@@ -11,7 +11,7 @@ const loginSchema = z.object({
   password: z.string(),
 })
 
-export default definePublicEventHandler(async (event) => {
+export default defineEventHandler(async (event) => {
   const body = await readBody(event)
   const { email, password } = loginSchema.parse(body)
 
@@ -34,7 +34,7 @@ export default definePublicEventHandler(async (event) => {
   }
 
   const accessToken = await signToken(tokenData, ACCESS_TOKEN_TTL)
-  const refreshToken = await signToken(tokenData, '7d')
+  const refreshToken = await signToken(tokenData, '7 days')
 
   return {
     token: {

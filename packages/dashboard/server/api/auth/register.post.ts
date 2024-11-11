@@ -4,8 +4,17 @@ import { hashPassword, isFirstUser } from '~/server/utils/auth'
 import { tables, useDrizzle } from '~/server/utils/drizzle'
 
 const registerSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(6),
+  email: z.string().email('请输入有效的邮箱地址'),
+  password: z.string()
+    .min(8, '密码长度至少为8位')
+    .regex(/[A-Z]/, '密码必须包含大写字母')
+    .regex(/[a-z]/, '密码必须包含小写字母')
+    .regex(/\d/, '密码必须包含数字')
+    .regex(/[^A-Z0-9]/i, '密码必须包含特殊字符'),
+  confirmPassword: z.string(),
+}).refine(data => data.password === data.confirmPassword, {
+  message: '两次输入的密码不一致',
+  path: ['confirmPassword'],
 })
 
 export default defineEventHandler(async (event) => {

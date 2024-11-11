@@ -1,11 +1,11 @@
 import { eq } from 'drizzle-orm'
-import { createError, eventHandler, readBody } from 'h3'
+import { createError, readBody } from 'h3'
 import type { JWTTokenPayload } from '~/server/types'
 import { ACCESS_TOKEN_TTL } from '~/server/utils/constant'
 import { tables, useDrizzle } from '~/server/utils/drizzle'
 import { signToken, verifyToken } from '~/server/utils/jwt'
 
-export default eventHandler(async (event) => {
+export default defineEventHandler(async (event) => {
   const body = await readBody<{ refreshToken: string }>(event)
   const refreshToken = body.refreshToken
 

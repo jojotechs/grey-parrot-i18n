@@ -4,9 +4,15 @@ import { JWT_SECRET } from './constant'
 const secret = new TextEncoder().encode(JWT_SECRET)
 
 export async function signToken(payload: any, expiresIn: string | number) {
+  const now = Math.floor(Date.now() / 1000)
   return await new jose.SignJWT(payload)
     .setProtectedHeader({ alg: 'HS256' })
-    .setExpirationTime(expiresIn)
+    .setIssuedAt()
+    .setExpirationTime(
+      typeof expiresIn === 'number'
+        ? now + expiresIn // 当前时间 + 过期秒数
+        : expiresIn, // 字符串格式保持不变
+    )
     .sign(secret)
 }
 
