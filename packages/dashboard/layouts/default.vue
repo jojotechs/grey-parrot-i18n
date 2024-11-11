@@ -22,7 +22,7 @@
       </UCard>
 
       <!-- 主要内容区域 -->
-      <div class="flex flex-1 gap-4 overflow-hidden p-1">
+      <div class="flex flex-1 gap-4 overflow-hidden p-[1px]">
         <!-- 左侧导航 -->
         <UCard class="w-64">
           <div class="h-full">
