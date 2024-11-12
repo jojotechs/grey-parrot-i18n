@@ -79,7 +79,7 @@ const userMenuItems = computed(() => [
           console.log(error)
           useToast().add({
             title: '登出失败',
-            description: '请稍后重试',
+            description: '稍后重试',
             color: 'red',
           })
         }
@@ -88,34 +88,39 @@ const userMenuItems = computed(() => [
   ],
 ])
 
-// 原有的导航链接
-const navigationLinks = [
-  {
-    label: '仪表盘',
-    icon: 'i-heroicons-home',
-    to: '/'
-  },
-  {
-    label: '多语言表',
-    icon: 'i-heroicons-language',
-    to: '/sheets'
-  },
-  {
-    label: '用户管理',
-    icon: 'i-heroicons-users',
-    to: '/users'
-  },
-  {
-    label: 'API Token',
-    icon: 'i-heroicons-key',
-    to: '/tokens'
-  },
-  {
-    label: '设置',
-    icon: 'i-heroicons-cog-6-tooth',
-    to: '/settings'
-  }
-]
+// 导航链接
+const navigationLinks = computed(() => {
+  const baseLinks = [
+    {
+      label: '仪表盘',
+      icon: 'i-heroicons-home',
+      to: '/'
+    },
+    {
+      label: '多语言表',
+      icon: 'i-heroicons-language',
+      to: '/sheets'
+    },
+    // admin 专属链接
+    ...(data.value?.role === 'admin' ? [{
+      label: '用户管理',
+      icon: 'i-heroicons-users',
+      to: '/users'
+    }] : []),
+    {
+      label: 'API Token',
+      icon: 'i-heroicons-key',
+      to: '/tokens'
+    },
+    {
+      label: '设置',
+      icon: 'i-heroicons-cog-6-tooth',
+      to: '/settings'
+    }
+  ]
+
+  return baseLinks
+})
 </script>
 
 <style>
