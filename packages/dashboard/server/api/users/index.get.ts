@@ -1,12 +1,25 @@
 import { defineAdminEventHandler } from '~/server/utils/auth'
+import { useDrizzle } from '~/server/utils/drizzle'
 
 export default defineAdminEventHandler(async (event, user) => {
   const db = useDrizzle()
-  const users = await db.query.users.findMany()
 
-  return users.map(user => ({
-    id: user.id,
-    email: user.email,
-    role: user.role,
-  }))
+  try {
+    const users = await db.query.users.findMany({
+      columns: {
+        id: true,
+        email: true,
+        role: true,
+      },
+    })
+
+    return users
+  }
+  catch (error) {
+    console.error('Failed to fetch users:', error)
+    throw createError({
+      statusCode: 500,
+      message: '获取用户列表失败',
+    })
+  }
 })

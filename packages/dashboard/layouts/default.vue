@@ -12,11 +12,20 @@
             <div class="font-bold text-lg">🦜 Grey Parrot i18n</div>
           </div>
           <div>
-            <UButton
-              color="gray"
-              variant="ghost"
-              icon="i-heroicons-user-circle"
-            />
+            <UDropdown
+              :items="userMenuItems"
+              :popper="{ placement: 'bottom-end' }"
+            >
+              <UButton
+                color="gray"
+                variant="ghost"
+                class="gap-2"
+              >
+                <div class="i-heroicons-user-circle text-xl" />
+                <span class="text-sm">{{ data?.email }}</span>
+                <div class="i-heroicons-chevron-down text-sm" />
+              </UButton>
+            </UDropdown>
           </div>
         </div>
       </UCard>
@@ -50,33 +59,68 @@
 </template>
 
 <script setup lang="ts">
-const navigationLinks = [
-  {
-    label: '仪表盘',
-    icon: 'i-heroicons-home',
-    to: '/'
-  },
-  {
-    label: '多语言表',
-    icon: 'i-heroicons-language',
-    to: '/sheets'
-  },
-  {
-    label: '用户管理',
-    icon: 'i-heroicons-users',
-    to: '/users'
-  },
-  {
-    label: 'API Token',
-    icon: 'i-heroicons-key',
-    to: '/tokens'
-  },
-  {
-    label: '设置',
-    icon: 'i-heroicons-cog-6-tooth',
-    to: '/settings'
-  }
-]
+const { signOut, data } = useAuth()
+
+// 用户菜单项
+const userMenuItems = computed(() => [
+  [
+    {
+      label: `角色：${data.value?.role}`,
+      disabled: true,
+    },
+    {
+      label: '登出',
+      icon: 'i-heroicons-arrow-right-circle-20-solid',
+      click: async () => {
+        try {
+          await signOut({callbackUrl: '/login'})
+        }
+        catch (error) {
+          console.log(error)
+          useToast().add({
+            title: '登出失败',
+            description: '稍后重试',
+            color: 'red',
+          })
+        }
+      },
+    },
+  ],
+])
+
+// 导航链接
+const navigationLinks = computed(() => {
+  const baseLinks = [
+    {
+      label: '仪表盘',
+      icon: 'i-heroicons-home',
+      to: '/'
+    },
+    {
+      label: '多语言表',
+      icon: 'i-heroicons-language',
+      to: '/sheets'
+    },
+    // admin 专属链接
+    ...(data.value?.role === 'admin' ? [{
+      label: '用户管理',
+      icon: 'i-heroicons-users',
+      to: '/users'
+    }] : []),
+    {
+      label: 'API Token',
+      icon: 'i-heroicons-key',
+      to: '/tokens'
+    },
+    {
+      label: '设置',
+      icon: 'i-heroicons-cog-6-tooth',
+      to: '/settings'
+    }
+  ]
+
+  return baseLinks
+})
 </script>
 
 <style>

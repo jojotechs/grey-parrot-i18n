@@ -99,6 +99,9 @@ async function handleLogin() {
     await signIn({
       email: form.email,
       password: form.password,
+    }, {
+      callbackUrl: '/',
+      redirect: true,
     })
   }
   catch (error: any) {

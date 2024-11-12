@@ -1,8 +1,6 @@
 import type { H3Event } from 'h3'
-import type { JWTTokenPayload } from '../types'
 import type { User } from './drizzle'
-import { getServerSession } from '#auth'
-import { eq, sql } from 'drizzle-orm'
+import { sql } from 'drizzle-orm'
 import { createError } from 'h3'
 import { hash, verify } from './crypto'
 import { tables, useDrizzle } from './drizzle'
@@ -34,42 +32,49 @@ export async function isFirstUser(): Promise<boolean> {
   return userCount[0].count === 0
 }
 
+// 从请求中获取用户信息
+async function getUserFromEvent(event: H3Event) {
+  try {
+    // 从 cookie 中获取 token
+    const token = getCookie(event, 'auth.token')
+
+    const response = await $fetch('/api/auth/me', {
+      headers: {
+        Authorization: token ? `Bearer ${token}` : '',
+      },
+    })
+
+    return response.user as User
+  }
+  catch (error) {
+    console.error('Failed to fetch user:', error)
+    throw createError({
+      statusCode: 401,
+      message: '未登录',
+    })
+  }
+}
+
 // 定义需要认证的路由处理器
 export function defineAuthEventHandler<T>(handler: (event: H3Event, user: User) => Promise<T>) {
   return defineEventHandler(async (event) => {
-    const session = await getServerSession(event) as { user: JWTTokenPayload } | null
-    if (!session?.user) {
-      throw createError({
-        statusCode: 401,
-        message: '未登录',
-      })
-    }
-
-    const db = useDrizzle()
-    const user = await db.query.users.findFirst({
-      where: eq(tables.users.id, session.user.id),
-    })
-
-    if (!user) {
-      throw createError({
-        statusCode: 401,
-        message: '用户不存在',
-      })
-    }
-
+    const user = await getUserFromEvent(event)
     return handler(event, user)
   })
 }
 
 // 定义需要管理员权限的路由处理器
 export function defineAdminEventHandler<T>(handler: (event: H3Event, user: User) => Promise<T>) {
-  return defineAuthEventHandler(async (event, user) => {
+  return defineEventHandler(async (event) => {
+    const user = await getUserFromEvent(event)
+
     if (user.role !== 'admin') {
       throw createError({
         statusCode: 403,
         message: '需要管理员权限',
       })
     }
+
     return handler(event, user)
   })
 }
