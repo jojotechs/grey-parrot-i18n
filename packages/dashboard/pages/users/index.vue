@@ -1,5 +1,6 @@
 <script setup lang="ts">
 definePageMeta({
+  title: '用户管理',
   validate: (route) => {
     const { data } = useAuth()
     return data.value?.role === 'admin'
