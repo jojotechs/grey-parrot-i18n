@@ -80,6 +80,131 @@ const totalPages = computed(() => {
   if(!users.value) return 0
   return Math.ceil(users.value.length / pageSize.value)
 })
+
+// 修改角色相关
+const isEditingRole = ref(false)
+const editingUser = ref<typeof users.value[0] | null>(null)
+const selectedRole = ref<string>('')
+
+const roleOptions = [
+  { value: 'admin', label: '管理员' },
+  { value: 'editor', label: '编辑者' },
+  { value: 'reader', label: '只读用户' },
+]
+
+const { data: currentUser } = useAuth()
+
+async function handleEditRole(user: typeof users.value[0]) {
+  // 检查是否是最后一个管理员
+  if (user.role === 'admin') {
+    const adminCount = users.value?.filter(u => u.role === 'admin').length || 0
+    if (adminCount <= 1) {
+      useToast().add({
+        title: '无法修改角色',
+        description: '系统必须保留至少一个管理员',
+        color: 'red',
+      })
+      return
+    }
+  }
+
+  editingUser.value = user
+  selectedRole.value = user.role
+  isEditingRole.value = true
+}
+
+async function updateRole() {
+  if (!editingUser.value) return
+
+  try {
+    await $fetch(`/api/users/${editingUser.value.id}/role`, {
+      method: 'PUT',
+      body: {
+        role: selectedRole.value,
+      },
+    })
+
+    // 刷新用户列表
+    await refresh()
+
+    useToast().add({
+      title: '修改成功',
+      color: 'green',
+    })
+  }
+  catch (error: any) {
+    useToast().add({
+      title: '修改失败',
+      description: error.data?.message || '请稍后重试',
+      color: 'red',
+    })
+  }
+  finally {
+    isEditingRole.value = false
+    editingUser.value = null
+  }
+}
+
+// 删除用户相关
+const isConfirmingDelete = ref(false)
+const deletingUser = ref<typeof users.value[0] | null>(null)
+
+async function handleDelete(user: typeof users.value[0]) {
+  // 不能删除自己
+  if (user.id === currentUser.value?.id) {
+    useToast().add({
+      title: '无法删除',
+      description: '不能删除自己的账号',
+      color: 'red',
+    })
+    return
+  }
+
+  // 检查是否是最后一个管理员
+  if (user.role === 'admin') {
+    const adminCount = users.value?.filter(u => u.role === 'admin').length || 0
+    if (adminCount <= 1) {
+      useToast().add({
+        title: '无法删除',
+        description: '系统必须保留至少一个管理员',
+        color: 'red',
+      })
+      return
+    }
+  }
+
+  deletingUser.value = user
+  isConfirmingDelete.value = true
+}
+
+async function confirmDelete() {
+  if (!deletingUser.value) return
+
+  try {
+    await $fetch(`/api/users/${deletingUser.value.id}`, {
+      method: 'DELETE',
+    })
+
+    // 刷新用户列表
+    await refresh()
+
+    useToast().add({
+      title: '删除成功',
+      color: 'green',
+    })
+  }
+  catch (error: any) {
+    useToast().add({
+      title: '删除失败',
+      description: error.data?.message || '请稍后重试',
+      color: 'red',
+    })
+  }
+  finally {
+    isConfirmingDelete.value = false
+    deletingUser.value = null
+  }
+}
 </script>
 
 <template>
@@ -117,6 +242,7 @@ const totalPages = computed(() => {
               {
                 label: '修改角色',
                 icon: 'i-heroicons-pencil-square-20-solid',
+                click: () => handleEditRole(row),
               },
             ],
             [
@@ -124,6 +250,7 @@ const totalPages = computed(() => {
                 label: '删除',
                 icon: 'i-heroicons-trash-20-solid',
                 color: 'red',
+                click: () => handleDelete(row),
               }
             ]
           ]"
@@ -145,5 +272,72 @@ const totalPages = computed(() => {
         :total="users?.length"
       />
     </div>
+
+    <!-- 修改角色对话框 -->
+    <UModal v-model="isEditingRole">
+      <UCard>
+        <template #header>
+          <div class="text-lg font-medium">修改角色</div>
+        </template>
+
+        <div class="space-y-4">
+          <p>修改 {{ editingUser?.email }} 的角色</p>
+          <USelect
+            v-model="selectedRole"
+            :options="roleOptions"
+          />
+        </div>
+
+        <template #footer>
+          <div class="flex justify-end gap-2">
+            <UButton
+              color="gray"
+              variant="soft"
+              @click="isEditingRole = false"
+            >
+              取消
+            </UButton>
+            <UButton
+              color="primary"
+              @click="updateRole"
+            >
+              确认
+            </UButton>
+          </div>
+        </template>
+      </UCard>
+    </UModal>
+
+    <!-- 删除确认对话框 -->
+    <UModal v-model="isConfirmingDelete">
+      <UCard>
+        <template #header>
+          <div class="text-lg font-medium">确认删除</div>
+        </template>
+
+        <div class="space-y-4">
+          <p>确定要删除用户 {{ deletingUser?.email }} 吗？</p>
+          <p class="text-sm text-red-500">此操作不可恢复！</p>
+        </div>
+
+        <template #footer>
+          <div class="flex justify-end gap-2">
+            <UButton
+              color="gray"
+              variant="soft"
+              @click="isConfirmingDelete = false"
+            >
+              取消
+            </UButton>
+            <UButton
+              color="red"
+              @click="confirmDelete"
+            >
+              确认删除
+            </UButton>
+          </div>
+        </template>
+      </UCard>
+    </UModal>
   </div>
 </template> 
