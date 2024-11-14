@@ -24,5 +24,6 @@ export function useTableFilter<T>(items: Ref<T[] | null>, pageSize = 10) {
     searchQuery,
     currentPage,
     filteredItems,
+    pageSize,
   }
 }

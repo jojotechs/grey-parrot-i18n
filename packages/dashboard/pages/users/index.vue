@@ -83,7 +83,7 @@ function handleDelete(user: User) {
 <template>
   <div class="space-y-4">
     <!-- 头部 -->
-    <div class="flex justify-between items-center">
+    <div class="flex justify-between items-center p-1">
       <h2 class="text-lg font-medium">用户管理</h2>
       <UInput
         v-model="searchQuery"
