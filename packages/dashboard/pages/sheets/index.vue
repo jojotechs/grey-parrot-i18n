@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Sheet } from '~/server/utils/drizzle'
+import dayjs from 'dayjs'
 
 const { sheets, error, languageMap } = useSheets()
 const { data: currentUser } = useAuth()
@@ -23,13 +23,7 @@ const canWrite = computed(() =>
 
 // 格式化日期
 function formatDate(date: string | number | Date) {
-  return new Date(date).toLocaleString('zh-CN', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
+  return dayjs(date).format('YYYY-MM-DD HH:mm')
 }
 </script>
 
@@ -56,7 +50,7 @@ function formatDate(date: string | number | Date) {
     </div>
 
     <!-- 多语言表网格 -->
-    <div v-if="filteredSheets.length" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div v-if="filteredSheets.length" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-1">
       <UCard
         v-for="sheet in filteredSheets"
         :key="sheet.id"

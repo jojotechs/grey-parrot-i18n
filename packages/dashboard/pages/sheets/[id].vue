@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { SheetFormData } from '~/server/schemas/sheet'
+import LanguageSelect from '~/components/sheets/LanguageSelect.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -82,11 +83,8 @@ async function handleSubmit() {
         label="支持的语言"
         required
       >
-        <USelect
+        <LanguageSelect
           v-model="form.languages"
-          :options="languageOptions"
-          multiple
-          placeholder="请选择语言"
         />
       </UFormGroup>
 

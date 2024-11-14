@@ -1,8 +1,8 @@
-import type { Sheet } from '~/server/utils/drizzle'
+import type { SheetWithParsedLanguages } from '~/server/utils/drizzle'
 
 export function useSheets() {
   // 获取多语言表列表
-  const { data: sheets, error, refresh } = useFetch<Sheet[]>('/api/sheets')
+  const { data: sheets, error, refresh } = useFetch<SheetWithParsedLanguages[]>('/api/sheets')
 
   // 获取语言名称映射
   const languageMap: Record<string, string> = {
