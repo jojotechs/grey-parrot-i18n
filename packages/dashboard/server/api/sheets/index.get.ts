@@ -18,7 +18,7 @@ export default defineAuthEventHandler(async (event) => {
 
     return sheets.map(sheet => ({
       ...sheet,
-      languages: JSON.parse(sheet.languages),
+      languages: JSON.parse(sheet.languages as string),
     }))
   }
   catch (error) {

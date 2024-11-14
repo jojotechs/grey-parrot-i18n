@@ -1,4 +1,4 @@
-import { sql } from 'drizzle-orm'
+import { relations, sql } from 'drizzle-orm'
 import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core'
 
 // 用户表
@@ -10,17 +10,28 @@ export const users = sqliteTable('users', {
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`CURRENT_TIMESTAMP`),
 })
 
-// 多语言表 - 包含表的基本信息和支持的语言
+// 多语言表
 export const sheets = sqliteTable('sheets', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   name: text('name').notNull(),
   description: text('description'),
-  // 支持的语言列表，如: ["zh-CN", "en", "ja"]
   languages: text('languages').notNull(),
   createdBy: integer('created_by').references(() => users.id),
   createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`CURRENT_TIMESTAMP`),
   updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(sql`CURRENT_TIMESTAMP`),
 })
+
+// 定义关联关系
+export const sheetsRelations = relations(sheets, ({ one }) => ({
+  creator: one(users, {
+    fields: [sheets.createdBy],
+    references: [users.id],
+  }),
+}))
+
+export const usersRelations = relations(users, ({ many }) => ({
+  sheets: many(sheets),
+}))
 
 // 文案条目表 - 每个 sheet 的具体文案内容
 export const entries = sqliteTable('entries', {
