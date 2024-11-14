@@ -4,29 +4,42 @@ import LanguageSelect from '~/components/sheets/LanguageSelect.vue'
 
 const route = useRoute()
 const router = useRouter()
-const { sheets, languageOptions, createSheet, updateSheet } = useSheets()
+const { sheets, getSheet, createSheet, updateSheet } = useSheets()
 
 // 判断是否是编辑模式
 const isEdit = computed(() => route.params.id !== 'create')
 
-// 获取当前编辑的表
-const currentSheet = computed(() => {
-  if (!isEdit.value) return null
-  return sheets.value?.find(s => s.id === Number(route.params.id))
-})
-
 // 表单数据
 const form = reactive<SheetFormData>({
-  name: currentSheet.value?.name || '',
-  description: currentSheet.value?.description || '',
-  languages: currentSheet.value?.languages || [],
+  name: '',
+  description: '',
+  languages: [],
 })
+
+// 如果是编辑模式，获取数据
+if (isEdit.value) {
+  try {
+    const sheet = await getSheet(Number(route.query.id))
+    form.name = sheet.name
+    form.description = sheet.description || ''
+    form.languages = sheet.languages
+  }
+  catch (error: any) {
+    useToast().add({
+      title: '获取数据失败',
+      description: error.data?.message || '请稍后重试',
+      color: 'red',
+    })
+    // 获取失败时返回列表页
+    router.push('/sheets')
+  }
+}
 
 // 提交处理
 async function handleSubmit() {
   try {
     if (isEdit.value) {
-      await updateSheet(Number(route.params.id), form)
+      await updateSheet(Number(route.query.id), form)
       useToast().add({
         title: '更新成功',
         color: 'green',

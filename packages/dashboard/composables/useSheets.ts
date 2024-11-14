@@ -56,6 +56,11 @@ export function useSheets() {
     })
   }
 
+  // 获取单个多语言表
+  async function getSheet(id: number) {
+    return await $fetch<SheetWithParsedLanguages>(`/api/sheets/${id}`)
+  }
+
   return {
     sheets,
     error,
@@ -65,5 +70,6 @@ export function useSheets() {
     createSheet,
     updateSheet,
     deleteSheet,
+    getSheet,
   }
 }

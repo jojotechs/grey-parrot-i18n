@@ -66,12 +66,7 @@ function formatDate(date: string | number | Date) {
                   {
                     label: '编辑',
                     icon: 'i-heroicons-pencil-square-20-solid',
-                    to: `/sheets/${sheet.id}/edit`,
-                  },
-                  {
-                    label: '导出',
-                    icon: 'i-heroicons-arrow-down-tray-20-solid',
-                    to: `/sheets/${sheet.id}/export`,
+                    to: `/sheets/edit?id=${sheet.id}`,
                   }
                 ],
                 [
