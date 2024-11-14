@@ -1,4 +1,12 @@
 <script setup lang="ts">
+// 添加认证元数据
+definePageMeta({
+  validate: () => {
+    const { data } = useAuth()
+    return data.value?.role === 'admin' || data.value?.role === 'editor'
+  }
+})
+
 import type { SheetFormData } from '~/server/schemas/sheet'
 import LanguageSelect from '~/components/sheets/LanguageSelect.vue'
 
@@ -16,24 +24,25 @@ const form = reactive<SheetFormData>({
   languages: [],
 })
 
-// 如果是编辑模式，获取数据
-if (isEdit.value) {
-  try {
-    const sheet = await getSheet(Number(route.query.id))
-    form.name = sheet.name
-    form.description = sheet.description || ''
-    form.languages = sheet.languages
+// 使用 onMounted 来获取数据
+onMounted(async () => {
+  if (isEdit.value) {
+    try {
+      const sheet = await getSheet(Number(route.query.id))
+      form.name = sheet.name
+      form.description = sheet.description || ''
+      form.languages = sheet.languages
+    }
+    catch (error: any) {
+      useToast().add({
+        title: '获取数据失败',
+        description: error.data?.message || '请稍后重试',
+        color: 'red',
+      })
+      router.push('/sheets')
+    }
   }
-  catch (error: any) {
-    useToast().add({
-      title: '获取数据失败',
-      description: error.data?.message || '请稍后重试',
-      color: 'red',
-    })
-    // 获取失败时返回列表页
-    router.push('/sheets')
-  }
-}
+})
 
 // 提交处理
 async function handleSubmit() {
