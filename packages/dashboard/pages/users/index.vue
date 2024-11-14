@@ -30,7 +30,7 @@ const columns = [
 ]
 
 // 获取用户列表数据
-const { data: users, error } = await useFetch('/api/users')
+const { data: users, error, refresh } = await useFetch('/api/users')
 
 // 如果获取失败，显示错误信息
 if (error.value) {
@@ -75,15 +75,9 @@ const filteredUsers = computed(() => {
   return result.slice(start, end)
 })
 
-// 总页数
-const totalPages = computed(() => {
-  if(!users.value) return 0
-  return Math.ceil(users.value.length / pageSize.value)
-})
-
 // 修改角色相关
 const isEditingRole = ref(false)
-const editingUser = ref<typeof users.value[0] | null>(null)
+const editingUser = ref<User | null>(null)
 const selectedRole = ref<string>('')
 
 const roleOptions = [
@@ -94,7 +88,7 @@ const roleOptions = [
 
 const { data: currentUser } = useAuth()
 
-async function handleEditRole(user: typeof users.value[0]) {
+async function handleEditRole(user: User) {
   // 检查是否是最后一个管理员
   if (user.role === 'admin') {
     const adminCount = users.value?.filter(u => u.role === 'admin').length || 0
@@ -147,9 +141,9 @@ async function updateRole() {
 
 // 删除用户相关
 const isConfirmingDelete = ref(false)
-const deletingUser = ref<typeof users.value[0] | null>(null)
+const deletingUser = ref<User | null>(null)
 
-async function handleDelete(user: typeof users.value[0]) {
+async function handleDelete(user: User) {
   // 不能删除自己
   if (user.id === currentUser.value?.id) {
     useToast().add({
@@ -268,7 +262,7 @@ async function confirmDelete() {
     <div class="flex justify-end">
       <UPagination
         v-model="currentPage"
-        :page-count="totalPages"
+        :page-count="10"
         :total="users?.length"
       />
     </div>
