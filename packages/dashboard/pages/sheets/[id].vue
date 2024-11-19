@@ -7,8 +7,9 @@ definePageMeta({
   }
 })
 
-import type { SheetFormData } from '~/server/schemas/sheet'
+import { sheetSchema, type SheetFormData } from '~/server/schemas/sheet'
 import LanguageSelect from '~/components/sheets/LanguageSelect.vue'
+import type { FormSubmitEvent } from '#ui/types'
 
 const route = useRoute()
 const router = useRouter()
@@ -17,21 +18,27 @@ const { sheets, getSheet, createSheet, updateSheet } = useSheets()
 // 判断是否是编辑模式
 const isEdit = computed(() => route.params.id !== 'create')
 
-// 表单数据
-const form = reactive<SheetFormData>({
+// 使用 zod schema 进行表单验证
+const schema = sheetSchema
+
+// 表单引用
+const formRef = ref()
+
+// 表单状态
+const state = reactive<SheetFormData>({
   name: '',
   description: '',
   languages: [],
 })
 
-// 使用 onMounted 来获取数据
+// 获取数据时更新状态
 onMounted(async () => {
   if (isEdit.value) {
     try {
       const sheet = await getSheet(Number(route.query.id))
-      form.name = sheet.name
-      form.description = sheet.description || ''
-      form.languages = sheet.languages
+      state.name = sheet.name
+      state.description = sheet.description || ''
+      state.languages = sheet.languages
     }
     catch (error: any) {
       useToast().add({
@@ -45,21 +52,15 @@ onMounted(async () => {
 })
 
 // 提交处理
-async function handleSubmit() {
+async function onSubmit(event: FormSubmitEvent<SheetFormData>) {
   try {
     if (isEdit.value) {
-      await updateSheet(Number(route.query.id), form)
-      useToast().add({
-        title: '更新成功',
-        color: 'green',
-      })
+      await updateSheet(Number(route.query.id), event.data)
+      useToast().add({ title: '更新成功', color: 'green' })
     }
     else {
-      await createSheet(form)
-      useToast().add({
-        title: '创建成功',
-        color: 'green',
-      })
+      await createSheet(event.data)
+      useToast().add({ title: '创建成功', color: 'green' })
     }
     router.push('/sheets')
   }
@@ -83,30 +84,41 @@ async function handleSubmit() {
       </div>
     </template>
 
-    <form class="space-y-4" @submit.prevent="handleSubmit">
+    <UForm
+      ref="formRef"
+      :schema="schema"
+      :state="state"
+      class="space-y-4"
+      @submit="onSubmit"
+    >
       <UFormGroup
+        name="name"
         label="表名"
         required
       >
         <UInput
-          v-model="form.name"
+          v-model="state.name"
           placeholder="请输入表名"
         />
       </UFormGroup>
 
-      <UFormGroup label="描述">
+      <UFormGroup
+        name="description"
+        label="描述"
+      >
         <UTextarea
-          v-model="form.description"
+          v-model="state.description"
           placeholder="请输入描述"
         />
       </UFormGroup>
 
       <UFormGroup
+        name="languages"
         label="支持的语言"
         required
       >
         <LanguageSelect
-          v-model="form.languages"
+          v-model="state.languages"
         />
       </UFormGroup>
 
@@ -125,6 +137,6 @@ async function handleSubmit() {
           {{ isEdit ? '更新' : '创建' }}
         </UButton>
       </div>
-    </form>
+    </UForm>
   </UCard>
 </template> 
