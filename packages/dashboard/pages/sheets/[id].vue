@@ -26,12 +26,10 @@ const columns = computed(() => {
     {
       key: 'key',
       label: 'KEY',
-      sortable: true,
     },
     ...sheet.value.languages.map(lang => ({
       key: `translations.${lang}`,
       label: lang,
-      sortable: true,
     })),
     {
       key: 'updatedAt',
