@@ -1,142 +1,162 @@
 <script setup lang="ts">
-// 添加认证元数据
-definePageMeta({
-  validate: () => {
-    const { data } = useAuth()
-    return data.value?.role === 'admin' || data.value?.role === 'editor'
-  }
-})
+import dayjs from 'dayjs'
+import { useAuth } from '#imports'
 
-import { sheetSchema, type SheetFormData } from '~/server/schemas/sheet'
-import LanguageSelect from '~/components/sheets/LanguageSelect.vue'
-import type { FormSubmitEvent } from '#ui/types'
+definePageMeta({
+  auth: true,
+})
 
 const route = useRoute()
-const router = useRouter()
-const { sheets, getSheet, createSheet, updateSheet } = useSheets()
+const { data: currentUser } = useAuth()
 
-// 判断是否是编辑模式
-const isEdit = computed(() => route.params.id !== 'create')
+// 获取 sheet 信息
+const { data: sheet } = await useFetch(`/api/sheets/${route.params.id}`)
 
-// 使用 zod schema 进行表单验证
-const schema = sheetSchema
+// 获取 sheet 条目
+const { data: entries } = await useFetch(`/api/sheets/${route.params.id}/entries`)
 
-// 表单引用
-const formRef = ref()
+// 计算是否有写权限
+const canWrite = computed(() => 
+  currentUser.value?.role === 'admin' || currentUser.value?.role === 'editor'
+)
 
-// 表单状态
-const state = reactive<SheetFormData>({
-  name: '',
-  description: '',
-  languages: [],
+// 表格列定义
+const columns = computed(() => {
+  if (!sheet.value) return []
+
+  return [
+    {
+      key: 'key',
+      label: 'KEY',
+      sortable: true,
+    },
+    ...sheet.value.languages.map(lang => ({
+      key: `translations.${lang}`,
+      label: lang,
+      sortable: true,
+    })),
+    {
+      key: 'updatedAt',
+      label: '更新时间',
+      sortable: true,
+    },
+    {
+      key: 'actions',
+      label: '操作',
+    },
+  ]
 })
 
-// 获取数据时更新状态
-onMounted(async () => {
-  if (isEdit.value) {
-    try {
-      const sheet = await getSheet(Number(route.query.id))
-      state.name = sheet.name
-      state.description = sheet.description || ''
-      state.languages = sheet.languages
-    }
-    catch (error: any) {
-      useToast().add({
-        title: '获取数据失败',
-        description: error.data?.message || '请稍后重试',
-        color: 'red',
-      })
-      router.push('/sheets')
-    }
-  }
+// 表格排序
+const sort = ref({
+  column: 'updatedAt',
+  direction: 'desc',
 })
 
-// 提交处理
-async function onSubmit(event: FormSubmitEvent<SheetFormData>) {
-  try {
-    if (isEdit.value) {
-      await updateSheet(Number(route.query.id), event.data)
-      useToast().add({ title: '更新成功', color: 'green' })
-    }
-    else {
-      await createSheet(event.data)
-      useToast().add({ title: '创建成功', color: 'green' })
-    }
-    router.push('/sheets')
-  }
-  catch (error: any) {
-    useToast().add({
-      title: isEdit.value ? '更新失败' : '创建失败',
-      description: error.data?.message || '请稍后重试',
-      color: 'red',
-    })
-  }
+// 格式化日期
+function formatDate(date: string | number | Date) {
+  return dayjs(date).format('YYYY-MM-DD HH:mm')
 }
 </script>
 
 <template>
-  <UCard>
-    <template #header>
-      <div class="flex items-center justify-between">
-        <h2 class="text-lg font-medium">
-          {{ isEdit ? '编辑多语言表' : '新建多语言表' }}
-        </h2>
+  <div class="space-y-4">
+    <!-- 头部 -->
+    <div class="flex justify-between items-center">
+      <div class="space-y-1">
+        <h2 class="text-lg font-medium">{{ sheet?.name }}</h2>
+        <p class="text-sm text-gray-500">{{ sheet?.description }}</p>
       </div>
-    </template>
-
-    <UForm
-      ref="formRef"
-      :schema="schema"
-      :state="state"
-      class="space-y-4"
-      @submit="onSubmit"
-    >
-      <UFormGroup
-        name="name"
-        label="表名"
-        required
-      >
-        <UInput
-          v-model="state.name"
-          placeholder="请输入表名"
-        />
-      </UFormGroup>
-
-      <UFormGroup
-        name="description"
-        label="描述"
-      >
-        <UTextarea
-          v-model="state.description"
-          placeholder="请输入描述"
-        />
-      </UFormGroup>
-
-      <UFormGroup
-        name="languages"
-        label="支持的语言"
-        required
-      >
-        <LanguageSelect
-          v-model="state.languages"
-        />
-      </UFormGroup>
-
-      <div class="flex justify-end gap-2">
+      <div class="flex items-center gap-2">
+        <UButton
+          v-if="canWrite"
+          color="primary"
+          icon="i-heroicons-plus"
+          :to="`/sheets/${route.params.id}/entries/create`"
+        >
+          添加条目
+        </UButton>
+        <UButton
+          v-if="canWrite"
+          color="primary"
+          variant="soft"
+          icon="i-heroicons-pencil-square"
+          :to="`/sheets/edit/${route.params.id}`"
+        >
+          编辑
+        </UButton>
         <UButton
           color="gray"
           variant="soft"
+          icon="i-heroicons-arrow-left"
           to="/sheets"
         >
-          取消
-        </UButton>
-        <UButton
-          type="submit"
-          color="primary"
-        >
-          {{ isEdit ? '更新' : '创建' }}
+          返回
         </UButton>
       </div>
-    </UForm>
-  </UCard>
+    </div>
+
+    <!-- 语言标签 -->
+    <div class="flex flex-wrap gap-2">
+      <UBadge
+        v-for="lang in sheet?.languages"
+        :key="lang"
+        :label="lang"
+        size="sm"
+      />
+    </div>
+
+    <!-- 条目表格 -->
+    <UCard>
+      <UTable
+        v-model:sort="sort"
+        :rows="entries"
+        :columns="columns"
+      >
+        <template #updatedAt-data="{ row }">
+          {{ formatDate(row.updatedAt) }}
+        </template>
+
+        <template #actions-data="{ row }">
+          <UDropdown
+            v-if="canWrite"
+            :items="[
+              [
+                {
+                  label: '编辑',
+                  icon: 'i-heroicons-pencil-square-20-solid',
+                  to: `/sheets/${route.params.id}/entries/${row.id}/edit`,
+                }
+              ],
+              [
+                {
+                  label: '删除',
+                  icon: 'i-heroicons-trash-20-solid',
+                  color: 'red',
+                  to: `/sheets/${route.params.id}/entries/${row.id}/delete`,
+                }
+              ]
+            ]"
+          >
+            <UButton
+              color="gray"
+              variant="ghost"
+              icon="i-heroicons-ellipsis-horizontal-20-solid"
+            />
+          </UDropdown>
+        </template>
+
+        <template #empty-state>
+          <div class="flex flex-col items-center justify-center py-6 gap-3">
+            <span class="italic text-sm">暂无条目</span>
+            <UButton
+              v-if="canWrite"
+              label="添加条目"
+              :to="`/sheets/${route.params.id}/entries/create`"
+            />
+          </div>
+        </template>
+      </UTable>
+    </UCard>
+  </div>
 </template> 
