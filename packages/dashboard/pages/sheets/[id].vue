@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
-import { useAuth } from '#imports'
 
 definePageMeta({
   auth: true,
@@ -8,12 +7,11 @@ definePageMeta({
 
 const route = useRoute()
 const { data: currentUser } = useAuth()
+const { getSheet, getSheetEntries } = useSheets()
 
-// 获取 sheet 信息
-const { data: sheet } = await useFetch(`/api/sheets/${route.params.id}`)
-
-// 获取 sheet 条目
-const { data: entries } = await useFetch(`/api/sheets/${route.params.id}/entries`)
+// 获取数据
+const sheet = ref(await getSheet(Number(route.params.id)))
+const entries = ref(await getSheetEntries(Number(route.params.id)))
 
 // 计算是否有写权限
 const canWrite = computed(() => 

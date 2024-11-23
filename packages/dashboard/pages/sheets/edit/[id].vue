@@ -13,7 +13,7 @@ import type { FormSubmitEvent } from '#ui/types'
 
 const route = useRoute()
 const router = useRouter()
-const { sheets, getSheet, createSheet, updateSheet } = useSheets()
+const { getSheet, createSheet, updateSheet } = useSheets()
 
 // 判断是否是编辑模式
 const isEdit = computed(() => route.params.id !== 'create')
@@ -36,9 +36,9 @@ onMounted(async () => {
   if (isEdit.value) {
     try {
       const sheet = await getSheet(Number(route.params.id))
-      state.name = sheet.name
-      state.description = sheet.description || ''
-      state.languages = sheet.languages
+      state.name = sheet?.name || ''
+      state.description = sheet?.description || ''
+      state.languages = sheet?.languages || []
     }
     catch (error: any) {
       useToast().add({
