@@ -17,12 +17,15 @@
     "dayjs": "^1.11.13",
     "drizzle-orm": "^0.36.1",
     "jose": "^5.9.6",
+    "js-yaml": "^4.1.0",
     "nuxt": "^3.14.159",
+    "openai": "^4.73.1",
     "vue": "latest",
     "vue-router": "latest",
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
     "drizzle-kit": "^0.28.0",
     "wrangler": "^3.86.0"
   }
