@@ -14,22 +14,21 @@
         </div>
       </template>
 
-      <form class="space-y-4" @submit.prevent="handleRegister">
+      <UForm
+        :schema="registerSchema"
+        :state="state"
+        class="space-y-4"
+        @submit="onSubmit"
+      >
         <UFormGroup
           label="邮箱"
           name="email"
           required
         >
           <UInput
-            v-model="form.email"
+            v-model="state.email"
             type="email"
             placeholder="请输入邮箱"
-            :ui="{ 
-              wrapper: 'relative flex-1',
-              base: 'relative block w-full',
-              input: 'w-full'
-            }"
-            required
           />
         </UFormGroup>
 
@@ -39,15 +38,9 @@
           required
         >
           <UInput
-            v-model="form.password"
+            v-model="state.password"
             type="password"
             placeholder="请输入密码"
-            :ui="{
-              wrapper: 'relative flex-1',
-              base: 'relative block w-full',
-              input: 'w-full'
-            }"
-            required
           />
           <div class="mt-2 text-xs space-y-1">
             <div class="flex items-center gap-2">
@@ -81,22 +74,10 @@
           required
         >
           <UInput
-            v-model="form.confirmPassword"
+            v-model="state.confirmPassword"
             type="password"
             placeholder="请再次输入密码"
-            :ui="{
-              wrapper: 'relative flex-1',
-              base: 'relative block w-full',
-              input: 'w-full'
-            }"
-            required
           />
-          <p
-            v-if="form.confirmPassword && form.password !== form.confirmPassword"
-            class="mt-1 text-xs text-red-500"
-          >
-            两次输入的密码不一致
-          </p>
         </UFormGroup>
 
         <div class="pt-4">
@@ -106,12 +87,11 @@
             variant="solid"
             block
             :loading="loading"
-            :disabled="!isFormValid"
           >
             {{ isFirstUser ? '创建管理员账号' : '注册' }}
           </UButton>
         </div>
-      </form>
+      </UForm>
 
       <template #footer>
         <div class="text-center text-sm text-gray-500 dark:text-gray-400">
@@ -130,6 +110,9 @@
 </template>
 
 <script setup lang="ts">
+import { registerSchema, type RegisterFormData } from '~/server/schemas/auth'
+import type { FormSubmitEvent } from '#ui/types'
+
 definePageMeta({
   layout: false,
   auth: {
@@ -141,18 +124,20 @@ definePageMeta({
 const { signIn } = useAuth()
 const loading = ref(false)
 const isFirstUser = ref(false)
-const form = reactive({
+
+// 表单状态
+const state = reactive<RegisterFormData>({
   email: '',
   password: '',
   confirmPassword: '',
 })
 
 // 密码验证规则
-const hasLength = computed(() => form.password.length >= 8)
-const hasUpperCase = computed(() => /[A-Z]/.test(form.password))
-const hasLowerCase = computed(() => /[a-z]/.test(form.password))
-const hasNumber = computed(() => /[0-9]/.test(form.password))
-const hasSpecial = computed(() => /[^A-Za-z0-9]/.test(form.password))
+const hasLength = computed(() => state.password.length >= 8)
+const hasUpperCase = computed(() => /[A-Z]/.test(state.password))
+const hasLowerCase = computed(() => /[a-z]/.test(state.password))
+const hasNumber = computed(() => /[0-9]/.test(state.password))
+const hasSpecial = computed(() => /[^A-Za-z0-9]/.test(state.password))
 
 // 密码强度计算
 const passwordStrength = computed(() => {
@@ -189,50 +174,27 @@ const passwordStrengthText = computed(() => {
   }
 })
 
-// 表单验证
-const isFormValid = computed(() => {
-  return (
-    form.email &&
-    form.password &&
-    form.confirmPassword &&
-    form.password === form.confirmPassword &&
-    hasLength.value &&
-    hasUpperCase.value &&
-    hasLowerCase.value &&
-    hasNumber.value &&
-    hasSpecial.value
-  )
-})
-
 // 检查是否是第一个用户
 const { data: initData } = await useAsyncData('check-init', () => 
   $fetch('/api/auth/check-init')
 )
 isFirstUser.value = !!initData.value?.needInit
 
-async function handleRegister() {
-  if (!isFormValid.value)
-    return
-    
+async function onSubmit(event: FormSubmitEvent<RegisterFormData>) {
   try {
     loading.value = true
     
     await $fetch('/api/auth/register', {
       method: 'POST',
-      body: {
-        email: form.email,
-        password: form.password,
-        confirmPassword: form.confirmPassword,
-      },
+      body: event.data,
     })
 
     // 注册成功后自动登录
     await signIn({
-      email: form.email,
-      password: form.password,
+      email: event.data.email,
+      password: event.data.password,
     }, { callbackUrl: '/' })
 
-    // 显示成功提示
     useToast().add({
       title: isFirstUser.value ? '管理员账号创建成功' : '注册成功',
       description: '正在为您跳转...',
@@ -240,7 +202,6 @@ async function handleRegister() {
     })
   }
   catch (error: any) {
-    console.log('register error', error)
     useToast().add({
       title: '注册失败',
       description: error?.data?.message || '请检查输入是否正确',

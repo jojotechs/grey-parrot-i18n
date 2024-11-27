@@ -42,7 +42,7 @@ function formatDate(date: string | number | Date) {
           v-if="canWrite"
           color="primary"
           icon="i-heroicons-plus"
-          to="/sheets/create"
+          to="/sheets/edit/create"
         >
           新建多语言表
         </UButton>
@@ -64,17 +64,14 @@ function formatDate(date: string | number | Date) {
               :items="[
                 [
                   {
+                    label: '查看',
+                    icon: 'i-heroicons-eye-20-solid',
+                    to: `/sheets/${sheet.id}`,
+                  },
+                  {
                     label: '编辑',
                     icon: 'i-heroicons-pencil-square-20-solid',
-                    to: `/sheets/edit?id=${sheet.id}`,
-                  }
-                ],
-                [
-                  {
-                    label: '删除',
-                    icon: 'i-heroicons-trash-20-solid',
-                    color: 'red',
-                    to: `/sheets/${sheet.id}/delete`,
+                    to: `/sheets/edit/${sheet.id}`,
                   }
                 ]
               ]"
@@ -107,7 +104,7 @@ function formatDate(date: string | number | Date) {
           <div class="flex items-center justify-between text-sm text-gray-500">
             <span>更新于 {{ formatDate(sheet.updatedAt) }}</span>
             <UButton
-              to="`/sheets/${sheet.id}`"
+              :to="`/sheets/${sheet.id}`"
               color="primary"
               variant="ghost"
               size="xs"
@@ -127,7 +124,7 @@ function formatDate(date: string | number | Date) {
         v-if="canWrite"
         color="primary"
         icon="i-heroicons-plus"
-        to="/sheets/create"
+        to="/sheets/edit/create"
       >
         新建多语言表
       </UButton>
