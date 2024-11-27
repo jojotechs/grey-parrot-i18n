@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
+import EntryAddModal from '~/components/sheets/EntryAddModal.vue'
 
 definePageMeta({
   auth: true,
@@ -53,6 +54,9 @@ const sort = ref({
 function formatDate(date: string | number | Date) {
   return dayjs(date).format('YYYY-MM-DD HH:mm')
 }
+
+// 添加条目相关
+const isAddingEntry = ref(false)
 </script>
 
 <template>
@@ -68,7 +72,7 @@ function formatDate(date: string | number | Date) {
           v-if="canWrite"
           color="primary"
           icon="i-heroicons-plus"
-          :to="`/sheets/${route.params.id}/entries/create`"
+          @click="isAddingEntry = true"
         >
           添加条目
         </UButton>
@@ -154,5 +158,13 @@ function formatDate(date: string | number | Date) {
         </template>
       </UTable>
     </UCard>
+
+    <!-- 添加条目弹窗 -->
+    <EntryAddModal
+      v-if="sheet"
+      v-model="isAddingEntry"
+      :languages="sheet.languages"
+      :sheet-id="Number(route.params.id)"
+    />
   </div>
 </template> 
