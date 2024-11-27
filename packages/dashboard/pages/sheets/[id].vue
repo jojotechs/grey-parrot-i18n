@@ -11,8 +11,13 @@ const { data: currentUser } = useAuth()
 const { getSheet, getSheetEntries } = useSheets()
 
 // 获取数据
-const sheet = ref(await getSheet(Number(route.params.id)))
-const entries = ref(await getSheetEntries(Number(route.params.id)))
+const { data: sheet } = await useAsyncData(`sheet-${route.params.id}`,
+  () => getSheet(Number(route.params.id))
+)
+
+const { data: entries, refresh: refreshEntries } = await useAsyncData(`entries-${route.params.id}`,
+  () => getSheetEntries(Number(route.params.id)) || []
+)
 
 // 计算是否有写权限
 const canWrite = computed(() => 
@@ -45,7 +50,10 @@ const columns = computed(() => {
 })
 
 // 表格排序
-const sort = ref({
+const sort = ref<{
+  column: string,
+  direction: 'desc' | 'asc'
+}>({
   column: 'updatedAt',
   direction: 'desc',
 })
@@ -110,7 +118,7 @@ const isAddingEntry = ref(false)
     <UCard>
       <UTable
         v-model:sort="sort"
-        :rows="entries"
+        :rows="entries || []"
         :columns="columns"
       >
         <template #updatedAt-data="{ row }">
@@ -132,7 +140,6 @@ const isAddingEntry = ref(false)
                 {
                   label: '删除',
                   icon: 'i-heroicons-trash-20-solid',
-                  color: 'red',
                   to: `/sheets/${route.params.id}/entries/${row.id}/delete`,
                 }
               ]
@@ -152,7 +159,7 @@ const isAddingEntry = ref(false)
             <UButton
               v-if="canWrite"
               label="添加条目"
-              :to="`/sheets/${route.params.id}/entries/create`"
+              @click="isAddingEntry = true"
             />
           </div>
         </template>
@@ -165,6 +172,7 @@ const isAddingEntry = ref(false)
       v-model="isAddingEntry"
       :languages="sheet.languages"
       :sheet-id="Number(route.params.id)"
+      @success="refreshEntries"
     />
   </div>
 </template> 

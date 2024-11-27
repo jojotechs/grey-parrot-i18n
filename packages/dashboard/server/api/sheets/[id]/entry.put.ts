@@ -4,7 +4,7 @@ import OpenAI from 'openai'
 import { entriesUpdateSchema } from '~/server/schemas/sheet'
 import { defineAuthEventHandler } from '~/server/utils/auth'
 import { tables, useDrizzle } from '~/server/utils/drizzle'
-import { createLogger } from '~/server/utils/logger'
+import { useLogger } from '~/server/utils/logger'
 
 export interface AITranslationResponse {
   key: string
@@ -18,12 +18,12 @@ export interface EntryUpdateResponse {
 }
 
 export default defineAuthEventHandler(async (event, user) => {
-  const log = createLogger(event)
+  const log = useLogger()
   try {
     if (user.role === 'reader') {
       throw createError({
         statusCode: 403,
-        message: '没有编辑权限',
+        message: 'No editing permission',
       })
     }
 
@@ -43,7 +43,7 @@ export default defineAuthEventHandler(async (event, user) => {
     if (!sheet) {
       throw createError({
         statusCode: 404,
-        message: '多语言表不存在',
+        message: 'Multi-language table does not exist',
       })
     }
 
@@ -72,9 +72,10 @@ export default defineAuthEventHandler(async (event, user) => {
     const prompt = [
       {
         role: 'system' as const,
-        content: `你是一个精通多国语言的专家。请将以下文案翻译成这些语言：${targetLanguages.join(', ')}。
-同时，为每条文案生成一个语义化的key（只包含小写字母、数字和下划线，不要包含原文中的特殊字符）。
-请以YAML格式返回，格式举例如下：
+        content: `You are a multilingual expert. Please translate the following text into these languages: ${targetLanguages.join(', ')}.
+Additionally, generate a semantic key for each text entry (using only lowercase letters, numbers, and underscores, without any special characters from the original text).
+Please return the result in YAML format, following this example:
+\`\`\`yaml
 entries:
   - key: first_semantic_key
     translations:
@@ -83,12 +84,15 @@ entries:
   - key: second_semantic_key
     translations:
       zh-CN: 第二条中文翻译
-      en: Second English translation`,
+      en: Second English translation
+\`\`\`
+ps: Return only the yaml content, nothing else.
+`,
       },
       {
         role: 'user' as const,
-        content: `源语言：${currentLanguage}
-源文案：
+        content: `Source language: ${currentLanguage}
+Source text:
 ${text.map((t, i) => `${i + 1}. ${t}`).join('\n')}`,
       },
     ]
@@ -102,7 +106,7 @@ ${text.map((t, i) => `${i + 1}. ${t}`).join('\n')}`,
     const content = response.choices[0].message.content
     log.debug('AI response:', content)
     if (!content) {
-      results.errors?.push('AI 返回内容为空')
+      results.errors?.push('AI returned empty content')
       results.success = false
       return results
     }
@@ -111,7 +115,7 @@ ${text.map((t, i) => `${i + 1}. ${t}`).join('\n')}`,
     const parsed = yaml.load(content.replace(/```yaml|```/g, '').trim()) as { entries: AITranslationResponse[] }
     log.debug('Parsed YAML:', parsed)
     if (!parsed.entries?.length) {
-      results.errors?.push('解析 AI 响应失败：未找到有效条目')
+      results.errors?.push('Failed to parse AI response: No valid entries found')
       results.success = false
       return results
     }
@@ -147,14 +151,14 @@ ${text.map((t, i) => `${i + 1}. ${t}`).join('\n')}`,
     return results
   }
   catch (error: unknown) {
-    log.error('Entry update error:', error)
+    log.debug('Entry update error:', error)
     if (error && typeof error === 'object' && 'statusCode' in error) {
       throw error
     }
 
     throw createError({
       statusCode: 500,
-      message: error instanceof Error ? error.message : '处理文案失败',
+      message: error instanceof Error ? error.message : 'Failed to process text',
     })
   }
 })

@@ -10,6 +10,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   'update:modelValue': [value: boolean]
+  'success': []
 }>()
 
 const { languageMap } = useSheets()
@@ -84,8 +85,8 @@ async function onSubmit(event: FormSubmitEvent<FormState>) {
     // 关闭弹窗
     emit('update:modelValue', false)
 
-    // 刷新父组件数据
-    await refreshNuxtData()
+    // 触发成功事件
+    emit('success')
   }
   catch (error: any) {
     useToast().add({
