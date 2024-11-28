@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@grey-parrot-i18n/cli": "workspace:^",
+    "@grey-parrot-i18n/shared": "workspace:^",
     "@grey-parrot-i18n/vue": "workspace:^",
     "@nuxt/ui": "^2.19.2",
     "@nuxthub/core": "^0.8.6",

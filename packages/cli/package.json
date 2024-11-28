@@ -15,6 +15,7 @@
     "prepublishOnly": "pnpm build"
   },
   "dependencies": {
+    "@grey-parrot-i18n/shared": "workspace:^",
     "boxen": "^8.0.1",
     "chalk": "^5.3.0",
     "chokidar": "^4.0.1",

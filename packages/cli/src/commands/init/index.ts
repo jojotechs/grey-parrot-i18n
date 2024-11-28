@@ -1,4 +1,5 @@
 import type { ProjectConfig } from '../../types'
+import { DEFAULT_LANGUAGE, LANGUAGE_OPTIONS } from '@grey-parrot-i18n/shared'
 import boxen from 'boxen'
 import chalk from 'chalk'
 import inquirer from 'inquirer'
@@ -22,13 +23,8 @@ export async function init() {
       type: 'list',
       name: 'defaultLocale',
       message: '请选择默认语言:',
-      choices: [
-        { name: '简体中文', value: 'zh-CN' },
-        { name: '英文', value: 'en' },
-        { name: '日文', value: 'ja' },
-        { name: '韩文', value: 'ko' },
-      ],
-      default: 'zh-CN',
+      choices: LANGUAGE_OPTIONS,
+      default: DEFAULT_LANGUAGE,
     },
     {
       type: 'confirm',

@@ -1,3 +1,4 @@
+import { LANGUAGE_MAP, LANGUAGE_OPTIONS } from '@grey-parrot-i18n/shared'
 import type { SheetWithParsedLanguages } from '~/server/utils/drizzle'
 
 export function useSheets() {
@@ -47,27 +48,6 @@ export function useSheets() {
     })
   }
 
-  // 获取语言名称映射
-  const languageMap: Record<string, string> = {
-    'zh-CN': '简体中文',
-    'zh-HK': '繁體中文（香港）',
-    'zh-TW': '繁體中文（台灣）',
-    'en': 'English',
-    'ja': '日本語',
-    'ko': '한국어',
-    'es': 'Español',
-    'pt': 'Português',
-    'ar': 'العربية',
-    'id': 'Bahasa Indonesia',
-    'th': 'ไทย',
-  }
-
-  // 语言选项
-  const languageOptions = Object.entries(languageMap).map(([value, label]) => ({
-    value,
-    label,
-  }))
-
   return {
     sheets,
     error,
@@ -77,7 +57,7 @@ export function useSheets() {
     createSheet,
     updateSheet,
     deleteSheet,
-    languageMap,
-    languageOptions,
+    languageMap: LANGUAGE_MAP,
+    languageOptions: LANGUAGE_OPTIONS,
   }
 }
