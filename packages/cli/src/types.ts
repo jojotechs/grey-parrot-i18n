@@ -1,5 +1,6 @@
 export interface ProjectConfig {
-  projectId: string // TODO: 项目ID，后面从dashboard获取
+  projectId: string
+  dashboardUrl: string
   defaultLocale: string
   scanDir: string
   include: string[]

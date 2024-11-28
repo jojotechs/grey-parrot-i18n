@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "description": "Grey Parrot I18n CLI",
   "bin": {
-    "grey-parrot": "./dist/index.cjs"
+    "grey-parrot": "./dist/index.mjs"
   },
   "publishConfig": {
     "access": "public"
