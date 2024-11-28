@@ -3,7 +3,7 @@
   "extends": "./.nuxt/tsconfig.json",
   "compilerOptions": {
     "types": [
-      "@grey-parrot-i18n/vue/dist/index.d.ts"
+      "@grey-parrot-i18n/vue"
     ]
   }
 }
