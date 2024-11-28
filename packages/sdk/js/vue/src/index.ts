@@ -10,6 +10,7 @@ declare module 'vue' {
   interface ComponentCustomProperties {
     $i18n: I18n
     $t: I18n['$t']
+    $tt: I18n['$tt']
   }
 }
 
@@ -20,6 +21,7 @@ export function createI18n(options: I18nOptions) {
     install(app: App) {
       app.config.globalProperties.$i18n = i18n
       app.config.globalProperties.$t = i18n.$t.bind(i18n)
+      app.config.globalProperties.$tt = i18n.$tt.bind(i18n)
       app.provide(I18nSymbol, i18n)
     },
     i18n,

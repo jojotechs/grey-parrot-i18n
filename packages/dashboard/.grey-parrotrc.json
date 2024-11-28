@@ -1,0 +1,17 @@
+{
+  "projectId": "temp-1732775307118",
+  "defaultLocale": "zh-CN",
+  "scanDir": ".",
+  "include": [
+    "**/*.{js,jsx,ts,tsx,vue}"
+  ],
+  "exclude": [
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/build/**",
+    "**/.git/**",
+    "**/coverage/**",
+    "**/.vscode/**",
+    "**/.idea/**"
+  ]
+}

@@ -8,9 +8,13 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
-    "db:generate": "drizzle-kit generate"
+    "db:generate": "drizzle-kit generate",
+    "lang:init": "grey-parrot init",
+    "lang:gen": "grey-parrot trans"
   },
   "dependencies": {
+    "@grey-parrot-i18n/cli": "workspace:^",
+    "@grey-parrot-i18n/vue": "workspace:^",
     "@nuxt/ui": "^2.19.2",
     "@nuxthub/core": "^0.8.6",
     "@sidebase/nuxt-auth": "^0.9.4",

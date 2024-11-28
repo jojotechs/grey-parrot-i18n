@@ -24,9 +24,9 @@ export async function init() {
       message: '请选择默认语言:',
       choices: [
         { name: '简体中文', value: 'zh-CN' },
-        { name: '英文', value: 'en-US' },
-        { name: '日文', value: 'ja-JP' },
-        { name: '韩文', value: 'ko-KR' },
+        { name: '英文', value: 'en' },
+        { name: '日文', value: 'ja' },
+        { name: '韩文', value: 'ko' },
       ],
       default: 'zh-CN',
     },
