@@ -3,7 +3,7 @@ import boxen from 'boxen'
 import chalk from 'chalk'
 import { Command } from 'commander'
 import { init } from './commands/init'
-import { watch } from './commands/watch'
+import { trans } from './commands/trans'
 
 const program = new Command()
 
@@ -21,9 +21,9 @@ program
   .version('0.1.0')
 
 program
-  .command('watch')
-  .description('监听项目中的多语言文案变化')
-  .action(watch)
+  .command('trans')
+  .description('扫描项目中的多语言文案并生成翻译')
+  .action(trans)
 
 program
   .command('init')
