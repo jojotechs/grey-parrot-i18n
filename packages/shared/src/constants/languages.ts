@@ -17,4 +17,4 @@ export const LANGUAGE_OPTIONS = Object.entries(LANGUAGE_MAP).map(([value, label]
   label,
 }))
 
-export const DEFAULT_LANGUAGE = 'zh-CN'
+export const DEFAULT_LANGUAGE = 'en'
