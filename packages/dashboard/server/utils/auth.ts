@@ -56,9 +56,63 @@ async function getUserFromEvent(event: H3Event) {
   }
 }
 
+// 验证 API Token
+async function validateApiToken(token: string) {
+  const db = useDrizzle()
+  const apiToken = await db.query.tokens.findFirst({
+    where: eq(tables.tokens.token, token),
+  })
+
+  if (!apiToken) {
+    throw createError({
+      statusCode: 401,
+      message: 'Invalid token',
+    })
+  }
+
+  // 检查是否过期
+  if (apiToken.expiresAt && new Date(apiToken.expiresAt) < new Date()) {
+    throw createError({
+      statusCode: 401,
+      message: 'Token expired',
+    })
+  }
+
+  return apiToken
+}
+
 // 定义需要认证的路由处理器
-export function defineAuthEventHandler<T>(handler: (event: H3Event, user: User) => Promise<T>) {
+export function defineAuthEventHandler<T>(
+  handler: (event: H3Event, user: User) => Promise<T>,
+  options?: {
+    allowApiToken?: boolean // 是否允许使用 API Token
+  },
+) {
   return defineEventHandler(async (event) => {
+    const db = useDrizzle()
+    const log = useLogger()
+    // 先尝试 API Token
+    if (options?.allowApiToken) {
+      const authHeader = getRequestHeader(event, 'Authorization')
+      if (authHeader?.startsWith('Bearer ')) {
+        try {
+          const token = authHeader.replace('Bearer ', '')
+          const apiToken = await validateApiToken(token)
+          const user = await db.query.users.findFirst({
+            where: eq(tables.users.id, apiToken.userId),
+          })
+          if (user) {
+            return handler(event, user)
+          }
+        }
+        catch (error) {
+          // API Token 验证失败,继续尝试用户会话
+          log.debug('API Token validation failed:', error)
+        }
+      }
+    }
+
+    // 回退到用户会话验证
     const user = await getUserFromEvent(event)
     return handler(event, user)
   })

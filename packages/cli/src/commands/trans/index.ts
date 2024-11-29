@@ -40,6 +40,33 @@ async function getAllFiles(
   return files.flat()
 }
 
+// 提交文案到服务器
+async function submitTexts(texts: string[], config: any) {
+  const token = process.env.GREY_PARROT_TOKEN
+  if (!token) {
+    throw new Error('Missing GREY_PARROT_TOKEN in .env file')
+  }
+
+  const response = await fetch(`${config.dashboardUrl}/api/sheets/${config.projectId}/entry`, {
+    method: 'PUT',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      text: texts.join('\n'),
+      currentLanguage: config.defaultLocale,
+    }),
+  })
+
+  if (!response.ok) {
+    const error = await response.json()
+    throw new Error(error.message || 'Failed to submit texts')
+  }
+
+  return response.json()
+}
+
 export async function trans() {
   const spinner = ora('正在扫描项目文件...').start()
 
@@ -77,14 +104,23 @@ export async function trans() {
       }
     }
 
-    // 打印扫描结果
-    console.log(chalk.blue(`\n共发现 ${totalMatches} 处待翻译文案：`))
-    results.forEach(({ file, matches }) => {
-      console.log(chalk.yellow(`\n📄 ${file}:`))
-      matches.forEach(({ text, line }) => {
-        console.log(chalk.gray(`  [行 ${line}] ${text}`))
+    // 收集所有待翻译的文案
+    const allTexts = results.flatMap(r => r.matches.map(m => m.text))
+
+    if (allTexts.length > 0) {
+      spinner.text = '正在提交文案到服务器...'
+      const response = await submitTexts(allTexts, config)
+      spinner.succeed(chalk.green(`成功提交 ${allTexts.length} 条文案`))
+
+      // 打印翻译结果
+      console.log(chalk.blue('\n翻译结果：'))
+      response.entries.forEach((entry: any) => {
+        console.log(chalk.yellow(`\n🔑 ${entry.key}:`))
+        Object.entries(entry.translations).forEach(([lang, text]) => {
+          console.log(chalk.gray(`  ${lang}: ${text}`))
+        })
       })
-    })
+    }
   }
   catch (error) {
     spinner.fail(chalk.red(error instanceof Error ? error.message : '未知错误'))

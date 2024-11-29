@@ -161,4 +161,4 @@ ${text.map((t, i) => `${i + 1}. ${t}`).join('\n')}`,
       message: error instanceof Error ? error.message : 'Failed to process text',
     })
   }
-})
+}, { allowApiToken: true })
