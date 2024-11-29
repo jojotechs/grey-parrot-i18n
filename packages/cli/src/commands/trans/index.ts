@@ -1,6 +1,7 @@
 import { promises as fs } from 'node:fs'
 import { resolve } from 'node:path'
 import chalk from 'chalk'
+import { config as loadEnv } from 'dotenv'
 import micromatch from 'micromatch'
 import ora from 'ora'
 import { getConfig } from '../../utils/config'
@@ -42,6 +43,9 @@ async function getAllFiles(
 
 // 提交文案到服务器
 async function submitTexts(texts: string[], config: any) {
+  // 加载 .env 文件
+  loadEnv({ path: resolve(process.cwd(), '.env') })
+
   const token = process.env.GREY_PARROT_TOKEN
   if (!token) {
     throw new Error('Missing GREY_PARROT_TOKEN in .env file')
@@ -54,7 +58,7 @@ async function submitTexts(texts: string[], config: any) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      text: texts.join('\n'),
+      text: texts,
       currentLanguage: config.defaultLocale,
     }),
   })
