@@ -1,5 +1,6 @@
 import { nanoid } from 'nanoid'
 import { z } from 'zod'
+import { UserRole } from '~/server/database/schema'
 import { defineAdminEventHandler } from '~/server/utils/auth'
 import { tables, useDrizzle } from '~/server/utils/drizzle'
 
@@ -32,4 +33,4 @@ export default defineAdminEventHandler(async (event, user) => {
     ...newToken,
     token, // 只在创建时返回完整token
   }
-}, ['admin', 'editor'])
+}, [UserRole.Admin, UserRole.Editor])

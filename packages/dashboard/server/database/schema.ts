@@ -1,12 +1,21 @@
 import { relations, sql } from 'drizzle-orm'
 import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core'
 
+// 用户角色枚举
+export enum UserRole {
+  Admin = 'admin',
+  Editor = 'editor',
+  Reader = 'reader',
+}
+
 // 用户表
 export const users = sqliteTable('users', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   email: text('email').notNull().unique(),
   password: text('password').notNull(),
-  role: text('role', { enum: ['admin', 'reader', 'editor'] }).notNull().default('reader'),
+  role: text('role', {
+    enum: Object.values(UserRole) as [string, ...string[]],
+  }).notNull().default(UserRole.Reader),
   createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull().default(sql`CURRENT_TIMESTAMP`),
 })
 

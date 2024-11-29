@@ -2,6 +2,7 @@ import type { H3Event } from 'h3'
 import type { User } from './drizzle'
 import { sql } from 'drizzle-orm'
 import { createError } from 'h3'
+import { UserRole } from '../database/schema'
 import { hash, verify } from './crypto'
 import { tables, useDrizzle } from './drizzle'
 
@@ -66,7 +67,7 @@ export function defineAuthEventHandler<T>(handler: (event: H3Event, user: User) 
 // 定义需要管理员权限的路由处理器
 export function defineAdminEventHandler<T>(
   handler: (event: H3Event, user: User) => Promise<T>,
-  allowedRoles: string[] = ['admin'], // 默认只允许 admin
+  allowedRoles: string[] = [UserRole.Admin], // 默认只允许 admin
 ) {
   return defineEventHandler(async (event) => {
     const user = await getUserFromEvent(event)
