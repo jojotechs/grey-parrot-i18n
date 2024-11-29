@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
 import { UserRole } from '~/server/database/schema'
+import DeleteConfirmModal from '~/components/common/DeleteConfirmModal.vue'
 
 definePageMeta({
   validate: () => {
@@ -27,6 +28,9 @@ const loading = ref(false)
 const state = reactive({
   name: '',
 })
+
+const showDeleteModal = ref(false)
+const deletingToken = ref<Token | null>(null)
 
 // 创建token
 async function handleCreate() {
@@ -84,6 +88,13 @@ async function handleDelete(id: number) {
       color: 'red',
     })
   }
+  finally {
+    // 先关闭弹窗
+    showDeleteModal.value = false
+    // 延迟清空数据
+    await nextTick()
+    deletingToken.value = null
+  }
 }
 
 // 格式化日期
@@ -94,6 +105,11 @@ function formatDate(date: string | number | null) {
 
 async function copyToClipboard(text: string) {
   await navigator.clipboard.writeText(text)
+}
+
+function handleDeleteClick(token: Token) {
+  deletingToken.value = token
+  showDeleteModal.value = true
 }
 </script>
 
@@ -146,7 +162,7 @@ async function copyToClipboard(text: string) {
             variant="ghost"
             icon="i-heroicons-trash"
             size="xs"
-            @click="handleDelete(row.id)"
+            @click="handleDeleteClick(row)"
           >
             删除
           </UButton>
@@ -203,5 +219,12 @@ async function copyToClipboard(text: string) {
         </form>
       </UCard>
     </UModal>
+
+    <!-- 删除确认框 -->
+    <DeleteConfirmModal
+      v-model="showDeleteModal"
+      :message="`确定要删除 Token「${deletingToken?.name}」吗？`"
+      @confirm="handleDelete(deletingToken!.id)"
+    />
   </div>
 </template>
