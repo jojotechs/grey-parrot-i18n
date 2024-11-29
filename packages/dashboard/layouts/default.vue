@@ -59,6 +59,8 @@
 </template>
 
 <script setup lang="ts">
+import { UserRole } from '~/server/database/schema';
+
 const { signOut, data } = useAuth()
 
 // 用户菜单项
@@ -102,16 +104,16 @@ const navigationLinks = computed(() => {
       to: '/sheets'
     },
     // admin 专属链接
-    ...(data.value?.role === 'admin' ? [{
+    ...(data.value?.role === UserRole.Admin ? [{
       label: '用户管理',
       icon: 'i-heroicons-users',
       to: '/users'
     }] : []),
-    {
+    ...([UserRole.Admin, UserRole.Editor].includes(data.value?.role) ? [{
       label: 'API Token',
       icon: 'i-heroicons-key',
       to: '/tokens'
-    },
+    }] : []),
     {
       label: '设置',
       icon: 'i-heroicons-cog-6-tooth',
