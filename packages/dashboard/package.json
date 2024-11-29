@@ -23,6 +23,7 @@
     "drizzle-orm": "^0.36.1",
     "jose": "^5.9.6",
     "js-yaml": "^4.1.0",
+    "nanoid": "^5.0.6",
     "nuxt": "^3.14.159",
     "openai": "^4.73.1",
     "vue": "latest",

@@ -111,6 +111,9 @@ importers:
       js-yaml:
         specifier: ^4.1.0
         version: 4.1.0
+      nanoid:
+        specifier: ^5.0.6
+        version: 5.0.8
       nuxt:
         specifier: ^3.14.159
         version: 3.14.159(@parcel/watcher@2.5.0)(@types/node@22.9.0)(drizzle-orm@0.36.1(@cloudflare/workers-types@4.20241106.0)(react@18.3.1))(eslint@9.14.0(jiti@2.4.0))(ioredis@5.4.1)(magicast@0.3.5)(optionator@0.9.4)(rollup@4.25.0)(terser@5.36.0)(typescript@5.6.3)(vite@5.4.11(@types/node@22.9.0)(terser@5.36.0))(webpack-sources@3.2.3)
