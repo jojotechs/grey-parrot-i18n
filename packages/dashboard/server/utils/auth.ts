@@ -64,14 +64,17 @@ export function defineAuthEventHandler<T>(handler: (event: H3Event, user: User) 
 }
 
 // 定义需要管理员权限的路由处理器
-export function defineAdminEventHandler<T>(handler: (event: H3Event, user: User) => Promise<T>) {
+export function defineAdminEventHandler<T>(
+  handler: (event: H3Event, user: User) => Promise<T>,
+  allowedRoles: string[] = ['admin'], // 默认只允许 admin
+) {
   return defineEventHandler(async (event) => {
     const user = await getUserFromEvent(event)
 
-    if (user.role !== 'admin') {
+    if (!allowedRoles.includes(user.role)) {
       throw createError({
         statusCode: 403,
-        message: '需要管理员权限',
+        message: '权限不足',
       })
     }
 

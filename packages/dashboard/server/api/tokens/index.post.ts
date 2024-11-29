@@ -1,13 +1,13 @@
 import { nanoid } from 'nanoid'
 import { z } from 'zod'
-import { defineAuthEventHandler } from '~/server/utils/auth'
+import { defineAdminEventHandler } from '~/server/utils/auth'
 import { tables, useDrizzle } from '~/server/utils/drizzle'
 
 const createTokenSchema = z.object({
   name: z.string().min(1, '请输入名称'),
 })
 
-export default defineAuthEventHandler(async (event, user) => {
+export default defineAdminEventHandler(async (event, user) => {
   const body = await readBody(event)
   const data = createTokenSchema.parse(body)
 
@@ -32,4 +32,4 @@ export default defineAuthEventHandler(async (event, user) => {
     ...newToken,
     token, // 只在创建时返回完整token
   }
-})
+}, ['admin', 'editor'])
