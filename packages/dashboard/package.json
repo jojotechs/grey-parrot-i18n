@@ -10,7 +10,8 @@
     "postinstall": "nuxt prepare",
     "db:generate": "drizzle-kit generate",
     "lang:init": "grey-parrot init",
-    "lang:gen": "grey-parrot trans"
+    "lang:gen": "grey-parrot trans",
+    "lang:pull": "grey-parrot pull"
   },
   "dependencies": {
     "@grey-parrot-i18n/cli": "workspace:^",
