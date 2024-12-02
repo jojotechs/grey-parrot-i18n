@@ -13,7 +13,7 @@ export async function init() {
   console.log(chalk.blue('\n🦜 让我们开始初始化您的多语言项目配置\n'))
 
   const answers = await inquirer.prompt<
-    ProjectConfig & { confirmScanDir: boolean, projectType: 'js' | 'flutter', token: string }
+    ProjectConfig & { confirmScanDir: boolean, confirmLangsDir: boolean, projectType: 'js' | 'flutter', token: string }
   >([
     {
       type: 'input',
@@ -63,6 +63,19 @@ export async function init() {
       ],
       default: 'js',
     },
+    {
+      type: 'confirm',
+      name: 'confirmLangsDir',
+      message: '是否需要自定义多语言文件目录？(默认为 ./langs)',
+      default: false,
+    },
+    {
+      type: 'input',
+      name: 'langsDir',
+      message: '请输入多语言文件目录 (相对于项目根目录):',
+      default: './langs',
+      when: answers => answers.confirmLangsDir,
+    },
   ])
 
   const spinner = ora('正在创建配置文件...').start()
@@ -74,6 +87,7 @@ export async function init() {
       dashboardUrl: answers.dashboardUrl,
       defaultLocale: answers.defaultLocale,
       scanDir: answers.scanDir || '.',
+      langsDir: answers.langsDir || './langs',
       include: DEFAULT_SCAN_PATTERNS[answers.projectType].include,
       exclude: DEFAULT_SCAN_PATTERNS[answers.projectType].exclude,
     }

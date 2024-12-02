@@ -3,6 +3,7 @@ import boxen from 'boxen'
 import chalk from 'chalk'
 import { Command } from 'commander'
 import { init } from './commands/init'
+import { pull } from './commands/pull'
 import { trans } from './commands/trans'
 
 const program = new Command()
@@ -29,5 +30,10 @@ program
   .command('init')
   .description('初始化项目的多语言配置')
   .action(init)
+
+program
+  .command('pull')
+  .description('从服务器拉取最新的多语言数据')
+  .action(pull)
 
 program.parse()

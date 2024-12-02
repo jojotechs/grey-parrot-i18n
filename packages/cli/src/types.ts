@@ -3,6 +3,7 @@ export interface ProjectConfig {
   dashboardUrl: string
   defaultLocale: string
   scanDir: string
+  langsDir: string
   include: string[]
   exclude: string[]
 }
