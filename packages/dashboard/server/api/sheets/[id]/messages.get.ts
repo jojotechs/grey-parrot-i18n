@@ -57,7 +57,7 @@ export default defineAuthEventHandler(async (event) => {
     return messages
   }
   catch (error: unknown) {
-    log.error('Failed to get messages:', error)
+    log.debug('Failed to get messages:', error)
     throw createError({
       statusCode: 500,
       message: error instanceof Error ? error.message : 'Failed to get messages',
