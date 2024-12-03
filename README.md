@@ -95,7 +95,81 @@ A comprehensive i18n management solution for developers, featuring AI-assisted t
 
 ## Quick Start
 
-Coming soon...
+### Initialize Project
+```bash
+npx @grey-parrot/cli init
+```
+
+### Pull Translations
+```bash
+npx @grey-parrot/cli pull
+```
+
+### Write your text
+```vue
+<template>
+  <div>{{ $tt('Welcome, {name}') }}</div>
+</template>
+```
+
+### Push Translations and Generate Language Files based on your text
+```bash
+npx @grey-parrot/cli trans
+```
+
+## i18n core sdk
+
+### Install
+```bash
+npm install @grey-parrot/core
+```
+
+### Usage
+
+1. Create language files in your project:
+
+```
+langs/
+en.json
+zh.json
+```
+
+2. Initialize with base locale:
+
+```typescript
+import { createI18n } from '@grey-parrot/core'
+
+const i18n = createI18n({
+  locale: 'zh',
+  messages: {
+    zh: {
+      'Welcome, {name}': '欢迎, {name}',
+    },
+    en: {
+      'Welcome, {name}': 'Welcome, {name}',
+    },
+  },
+})
+```
+
+3. Use with dynamic import:
+
+```typescript
+// Helper function for lazy loading
+async function loadLocaleMessages(locale: string) {
+  // Works in both Vite and Webpack
+  const messages = await import(`./langs/${locale}.json`)
+  i18n.add(locale, messages.default) // Use .default for ESM imports
+}
+
+// Use in your app
+async function changeLocale(locale: string) {
+  if (!i18n.hasLocale(locale)) {
+    await loadLocaleMessages(locale)
+  }
+  i18n.setLocale(locale)
+}
+```
 
 ## License
 

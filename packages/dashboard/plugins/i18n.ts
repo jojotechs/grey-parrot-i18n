@@ -1,20 +1,17 @@
 import { createI18n } from '@grey-parrot-i18n/vue'
+import en from '../langs/en.json'
+import zhCN from '../langs/zh-CN.json'
 
-export default defineNuxtPlugin((nuxtApp) => {
+export default defineNuxtPlugin(async (nuxtApp) => {
   const { install, i18n } = createI18n({
-    locale: 'zh',
+    locale: 'zh-CN',
+    fallbackLocale: 'zh-CN',
     messages: {
-      zh: {
-        // 你的中文翻译
-      },
-      en: {
-        // 你的英文翻译
-      },
+      'zh-CN': zhCN,
+      en,
     },
   })
-
   nuxtApp.vueApp.use(install)
-
   return {
     provide: {
       i18n,

@@ -82,7 +82,7 @@ const isAddingEntry = ref(false)
           icon="i-heroicons-plus"
           @click="isAddingEntry = true"
         >
-          {{$tt('添加条目')}}
+          {{$t('add_entry')}}
         </UButton>
         <UButton
           v-if="canWrite"
