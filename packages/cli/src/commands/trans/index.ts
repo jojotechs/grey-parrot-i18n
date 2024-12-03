@@ -88,8 +88,16 @@ export async function trans() {
     spinner.succeed(chalk.green(`扫描完成，找到 ${files.length} 个待处理文件`))
 
     // 扫描结果统计
-    let totalMatches = 0
     const results: Array<{ file: string, matches: Array<{ text: string, line: number }> }> = []
+
+    // Add a new interface for tracking duplicates
+    interface TextLocation {
+      file: string
+      line: number
+    }
+
+    // Inside the trans function, before submitting texts:
+    const textMap = new Map<string, TextLocation[]>()
 
     // 处理每个文件
     for (const file of files) {
@@ -97,7 +105,16 @@ export async function trans() {
       const matches = extractI18nText(content)
 
       if (matches.length > 0) {
-        totalMatches += matches.length
+        // Track locations for each text
+        matches.forEach((m) => {
+          const locations = textMap.get(m.text) || []
+          locations.push({
+            file: file.replace(baseDir, '').replace(/^\//, ''),
+            line: m.lineNumber,
+          })
+          textMap.set(m.text, locations)
+        })
+
         results.push({
           file: file.replace(baseDir, '').replace(/^\//, ''),
           matches: matches.map(m => ({
@@ -108,13 +125,27 @@ export async function trans() {
       }
     }
 
-    // 收集所有待翻译的文案
-    const allTexts = results.flatMap(r => r.matches.map(m => m.text))
+    // Report duplicates before submission
+    const duplicates = Array.from(textMap.entries())
+      .filter(([_, locations]) => locations.length > 1)
 
-    if (allTexts.length > 0) {
+    if (duplicates.length > 0) {
+      console.log(chalk.yellow('\nFound duplicate texts:'))
+      duplicates.forEach(([text, locations]) => {
+        console.log(chalk.cyan(`\n"${text}" appears in:`))
+        locations.forEach((loc) => {
+          console.log(chalk.gray(`  ${loc.file}:${loc.line}`))
+        })
+      })
+    }
+
+    // Use deduplicated texts for submission
+    const uniqueTexts = Array.from(textMap.keys())
+
+    if (uniqueTexts.length > 0) {
       spinner.text = '正在提交文案到服务器...'
-      const response = await submitTexts(allTexts, config)
-      spinner.succeed(chalk.green(`成功提交 ${allTexts.length} 条文案`))
+      const response = await submitTexts(uniqueTexts, config)
+      spinner.succeed(chalk.green(`成功提交 ${uniqueTexts.length} 条文案`))
 
       // 打印翻译结果
       console.log(chalk.blue('\n翻译结果：'))
