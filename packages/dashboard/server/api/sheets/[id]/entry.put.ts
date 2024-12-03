@@ -71,13 +71,20 @@ export default defineAuthEventHandler(async (event, user) => {
       })
     }
 
-    // 查找所有包含相同文案的条目
+    // Construct the JSON path as a raw string
+    const jsonPath = `'$."${currentLanguage}"'`
+
+    // Build the conditions without parameterized the JSON path
+    const conditions = text.map(t =>
+      sql`json_extract(${tables.entries.translations}, ${sql.raw(jsonPath)}) = ${t}`,
+    )
+
+    // Now, use these conditions in your query
     const allMatchingEntries = await db.query.entries.findMany({
       where: sql`
-        EXISTS (
-          SELECT value 
-          FROM json_each(${tables.entries.translations})
-          WHERE value IN (${text})
+        json_valid(${tables.entries.translations})
+        AND (
+          ${sql.join(conditions, sql` OR `)}
         )
       `,
       orderBy: sql`CASE WHEN ${tables.entries.sheetId} = ${sheetId} THEN 0 ELSE 1 END`,
@@ -194,7 +201,7 @@ ${textsToTranslate.map((t, i) => `${i + 1}. ${t}`).join('\n')}`,
         return results
       }
 
-      // 解析 YAML 响应
+      // 解析 YAML 应
       const parsed = yaml.load(content.replace(/```yaml|```/g, '').trim()) as { entries: AITranslationResponse[] }
       log.debug('Parsed YAML:', parsed)
       if (!parsed.entries?.length) {
