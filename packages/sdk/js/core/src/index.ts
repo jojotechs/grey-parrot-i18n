@@ -6,6 +6,9 @@ export class I18n {
   private currentLocale = ref('')
   private fallbackLocale?: LocaleType
 
+  // Languages that require region codes to be preserved
+  private static readonly REGION_SPECIFIC_LANGS = new Set(['zh'])
+
   constructor(options: I18nOptions) {
     if (options.messages)
       this.languages = options.messages
@@ -87,6 +90,19 @@ export class I18n {
 
   getMessages() {
     return this.languages
+  }
+
+  static getLanguageFromLocale(locale: string): string | undefined {
+    if (!locale || typeof locale !== 'string')
+      return undefined
+
+    const [lang, region] = locale.toLowerCase().split('-')
+
+    // Keep region for specific languages
+    if (this.REGION_SPECIFIC_LANGS.has(lang) && region)
+      return `${lang}-${region}`
+
+    return lang
   }
 }
 
