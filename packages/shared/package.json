@@ -1,8 +1,7 @@
 {
-  "name": "@grey-parrot-i18n/core",
+  "name": "@grey-parrot-i18n/shared",
   "type": "module",
   "version": "0.1.0",
-  "description": "Grey Parrot I18n Core Package",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -10,17 +9,14 @@
       "require": "./dist/index.cjs"
     }
   },
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.mjs",
+  "main": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "dev": "unbuild --watch",
+    "dev": "unbuild --stub",
     "build": "unbuild",
     "prepublishOnly": "pnpm build"
-  },
-  "dependencies": {
-    "@vue/reactivity": "^3.5.12"
-  },
-  "devDependencies": {
   }
 }

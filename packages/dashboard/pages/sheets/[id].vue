@@ -82,7 +82,7 @@ const isAddingEntry = ref(false)
           icon="i-heroicons-plus"
           @click="isAddingEntry = true"
         >
-          添加条目
+          {{$tt('添加条目')}}
         </UButton>
         <UButton
           v-if="canWrite"
@@ -138,7 +138,7 @@ const isAddingEntry = ref(false)
               ],
               [
                 {
-                  label: '删除',
+                  label: $tt('删除'),
                   icon: 'i-heroicons-trash-20-solid',
                   to: `/sheets/${route.params.id}/entries/${row.id}/delete`,
                 }
@@ -155,10 +155,10 @@ const isAddingEntry = ref(false)
 
         <template #empty-state>
           <div class="flex flex-col items-center justify-center py-6 gap-3">
-            <span class="italic text-sm">暂无条目</span>
+            <span class="italic text-sm">{{$tt('暂无条目')}}</span>
             <UButton
               v-if="canWrite"
-              label="添加条目"
+              :label="$tt('添加条目')"
               @click="isAddingEntry = true"
             />
           </div>

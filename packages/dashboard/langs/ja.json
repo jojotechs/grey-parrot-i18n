@@ -1,0 +1,9 @@
+{
+  "multilingual_table": "多言語テーブル",
+  "dashboard": "ダッシュボード",
+  "user_management": "ユーザー管理",
+  "translation_table": "翻訳表",
+  "application": "アプリケーション",
+  "add_entry": "エントリーを追加",
+  "add_product_quantity": "商品を{number}個追加"
+}

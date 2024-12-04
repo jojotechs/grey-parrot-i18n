@@ -1,0 +1,19 @@
+{
+  "projectId": "1",
+  "defaultLocale": "zh-CN",
+  "dashboardUrl": "http://localhost:3000",
+  "scanDir": ".",
+  "langsDir": "./langs",
+  "include": [
+    "**/*.{js,jsx,ts,tsx,vue}"
+  ],
+  "exclude": [
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/build/**",
+    "**/.git/**",
+    "**/coverage/**",
+    "**/.vscode/**",
+    "**/.idea/**"
+  ]
+}

@@ -14,7 +14,7 @@
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "dev": "unbuild --stub",
+    "dev": "unbuild --watch",
     "build": "unbuild",
     "prepublishOnly": "pnpm build"
   },
@@ -25,7 +25,6 @@
     "@grey-parrot-i18n/core": "workspace:*"
   },
   "devDependencies": {
-    "unbuild": "^2.0.0",
     "vue": "^3.4.0"
   }
 }

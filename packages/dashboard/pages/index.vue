@@ -27,7 +27,7 @@
             </template>
           </UCard>
 
-          <UCard>
+          <UCard v-if="data?.role === UserRole.Admin">
             <template #header>
               <h3 class="font-bold">用户管理</h3>
             </template>
@@ -43,7 +43,7 @@
             </template>
           </UCard>
 
-          <UCard>
+          <UCard v-if="[UserRole.Admin, UserRole.Editor].includes(data?.role)">
             <template #header>
               <h3 class="font-bold">API Token</h3>
             </template>
@@ -65,7 +65,11 @@
 </template> 
 
 <script lang="ts" setup>
+import { UserRole } from '~/server/database/schema'
+
 definePageMeta({
   auth: true,
 })
+
+const { data } = useAuth()
 </script>

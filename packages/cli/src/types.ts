@@ -1,7 +1,9 @@
 export interface ProjectConfig {
-  projectId: string // TODO: 项目ID，后面从dashboard获取
+  projectId: string
+  dashboardUrl: string
   defaultLocale: string
   scanDir: string
+  langsDir: string
   include: string[]
   exclude: string[]
 }
@@ -19,4 +21,31 @@ export interface I18nMatch {
   lineNumber: number
   column: number
   params?: string
+}
+
+export interface TextLocation {
+  file: string
+  line: number
+}
+
+export interface FileMatch {
+  file: string
+  matches: Array<{
+    text: string
+    line: number
+    start: number
+    end: number
+    fullMatch: string
+  }>
+}
+
+export interface TransResponse {
+  entries: Array<{
+    key: string
+    translations: Record<string, string>
+  }>
+}
+
+export interface TransOptions {
+  replace?: boolean
 }

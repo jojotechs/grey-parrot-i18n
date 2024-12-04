@@ -6,6 +6,9 @@ export class I18n {
   private currentLocale = ref('')
   private fallbackLocale?: LocaleType
 
+  // Languages that require region codes to be preserved
+  private static readonly REGION_SPECIFIC_LANGS = new Set(['zh'])
+
   constructor(options: I18nOptions) {
     if (options.messages)
       this.languages = options.messages
@@ -87,6 +90,28 @@ export class I18n {
 
   getMessages() {
     return this.languages
+  }
+
+  static getLanguage(locale?: string) {
+    if (locale)
+      return this.processLocale(locale)
+
+    // Check if we're in a browser environment
+    if (typeof window === 'undefined' || !window.navigator)
+      return undefined
+
+    const browserLocale = navigator.language || navigator.languages?.[0]
+    return browserLocale ? this.processLocale(browserLocale) : undefined
+  }
+
+  private static processLocale(locale: string) {
+    const [lang, region] = locale.toLowerCase().split('-')
+
+    // Keep region for specific languages
+    if (this.REGION_SPECIFIC_LANGS.has(lang) && region)
+      return `${lang}-${region}`
+
+    return lang
   }
 }
 
