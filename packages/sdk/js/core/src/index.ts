@@ -92,10 +92,19 @@ export class I18n {
     return this.languages
   }
 
-  static getLanguageFromLocale(locale: string): string | undefined {
-    if (!locale || typeof locale !== 'string')
+  static getLanguage(locale?: string) {
+    if (locale)
+      return this.processLocale(locale)
+
+    // Check if we're in a browser environment
+    if (typeof window === 'undefined' || !window.navigator)
       return undefined
 
+    const browserLocale = navigator.language || navigator.languages?.[0]
+    return browserLocale ? this.processLocale(browserLocale) : undefined
+  }
+
+  private static processLocale(locale: string) {
     const [lang, region] = locale.toLowerCase().split('-')
 
     // Keep region for specific languages
