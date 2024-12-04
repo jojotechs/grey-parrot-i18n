@@ -1,3 +1,4 @@
+import type { FileMatch, ProjectConfig, TextLocation, TransOptions, TransResponse } from '../../types'
 import { promises as fs } from 'node:fs'
 import { resolve } from 'node:path'
 import chalk from 'chalk'
@@ -6,6 +7,7 @@ import micromatch from 'micromatch'
 import ora from 'ora'
 import { getConfig } from '../../utils/config'
 import { DEFAULT_SCAN_PATTERNS } from '../../utils/constants'
+import { pull } from '../pull'
 import { extractI18nText } from './scan'
 
 async function getAllFiles(
@@ -42,7 +44,7 @@ async function getAllFiles(
 }
 
 // 提交文案到服务器
-async function submitTexts(texts: string[], config: any) {
+async function submitTexts(texts: string[], config: ProjectConfig): Promise<TransResponse> {
   // 加载 .env 文件
   loadEnv({ path: resolve(process.cwd(), '.env') })
 
@@ -71,8 +73,41 @@ async function submitTexts(texts: string[], config: any) {
   return response.json()
 }
 
-export async function trans() {
-  const spinner = ora('正在扫描项目文件...').start()
+async function replaceTexts(
+  results: FileMatch[],
+  response: TransResponse,
+  baseDir: string,
+  defaultLocale: string,
+): Promise<void> {
+  const textToKey = new Map(
+    response.entries.map(entry => [entry.translations[defaultLocale], entry.key]),
+  )
+
+  for (const result of results) {
+    const filePath = resolve(baseDir, result.file)
+    const content = await fs.readFile(filePath, 'utf-8')
+
+    // 直接使用已保存的matches信息，不需要重新扫描
+    const matches = result.matches
+    // 按位置倒序排序
+    matches.sort((a, b) => b.start - a.start)
+
+    let newContent = content
+    for (const match of matches) {
+      const key = textToKey.get(match.text)
+      if (key) {
+        newContent = `${newContent.slice(0, match.start)
+        }$t('${key}')${
+          newContent.slice(match.end)}`
+      }
+    }
+
+    await fs.writeFile(filePath, newContent, 'utf-8')
+  }
+}
+
+export async function trans(options: TransOptions = {}): Promise<void> {
+  const spinner = ora('正在扫描项目文件...')
 
   try {
     const config = await getConfig()
@@ -80,6 +115,7 @@ export async function trans() {
       scanDir = '.',
       include = DEFAULT_SCAN_PATTERNS.js.include,
       exclude = DEFAULT_SCAN_PATTERNS.js.exclude,
+      defaultLocale,
     } = config
 
     const baseDir = resolve(process.cwd(), scanDir)
@@ -88,15 +124,7 @@ export async function trans() {
     spinner.succeed(chalk.green(`扫描完成，找到 ${files.length} 个待处理文件`))
 
     // 扫描结果统计
-    const results: Array<{ file: string, matches: Array<{ text: string, line: number }> }> = []
-
-    // Add a new interface for tracking duplicates
-    interface TextLocation {
-      file: string
-      line: number
-    }
-
-    // Inside the trans function, before submitting texts:
+    const results: FileMatch[] = []
     const textMap = new Map<string, TextLocation[]>()
 
     // 处理每个文件
@@ -120,6 +148,9 @@ export async function trans() {
           matches: matches.map(m => ({
             text: m.text,
             line: m.lineNumber,
+            start: m.start, // 保存位置信息
+            end: m.end,
+            fullMatch: m.fullMatch,
           })),
         })
       }
@@ -155,6 +186,21 @@ export async function trans() {
           console.log(chalk.gray(`  ${lang}: ${text}`))
         })
       })
+
+      // Handle replacement and pull in parallel if replace flag is set
+      if (options.replace) {
+        spinner.start('正在替换文案并拉取最新翻译...')
+        await Promise.all([
+          replaceTexts(results, response, baseDir, defaultLocale),
+          pull(),
+        ])
+        spinner.succeed(chalk.green('文案替换和翻译更新完成'))
+      }
+      else {
+        // Just pull new translations
+        await pull()
+        spinner.succeed(chalk.green('翻译更新完成'))
+      }
     }
   }
   catch (error) {

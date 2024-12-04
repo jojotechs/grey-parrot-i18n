@@ -22,3 +22,30 @@ export interface I18nMatch {
   column: number
   params?: string
 }
+
+export interface TextLocation {
+  file: string
+  line: number
+}
+
+export interface FileMatch {
+  file: string
+  matches: Array<{
+    text: string
+    line: number
+    start: number
+    end: number
+    fullMatch: string
+  }>
+}
+
+export interface TransResponse {
+  entries: Array<{
+    key: string
+    translations: Record<string, string>
+  }>
+}
+
+export interface TransOptions {
+  replace?: boolean
+}

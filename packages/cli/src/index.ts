@@ -24,6 +24,7 @@ program
 program
   .command('trans')
   .description('扫描项目中的多语言文案并生成翻译')
+  .option('-r, --replace', '替换原文案为翻译key')
   .action(trans)
 
 program
